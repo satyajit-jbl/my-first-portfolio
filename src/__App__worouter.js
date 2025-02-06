@@ -1,7 +1,4 @@
-import { AboutMe } from "./components/AboutMe"
 import { Contact } from "./components/Contact"
-import { EducationalQualification } from "./components/EducationalQualification"
-import { Footer } from "./components/Footer"
 import { Hero } from "./components/Hero"
 import { Navbar } from "./components/Navbar"
 import { Projects } from "./components/Projects"
@@ -19,12 +16,9 @@ function App() {
 
         <Navbar></Navbar>
         <Hero></Hero>
-        <AboutMe></AboutMe>
-        <EducationalQualification></EducationalQualification>
         <Tech></Tech>
         <Projects></Projects>
         <Contact></Contact>
-        {/* <Footer></Footer> */}
       </main>
     </>
   )
