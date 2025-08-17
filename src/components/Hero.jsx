@@ -24,10 +24,19 @@ export const Hero = () => {
           {/* <p className="md:text-base text-pretty text-sm text-gray-400">
             A passionate front-end developer with a background in Mathematics & MBA(Finance), I transitioned into web development out of a deep love for designing engaging
           </p> */}
-          <a href="mailto:satyajit_jbl@yahoo.com" className="text-nowrap rounded-lg border border-indigo-600 bg-black px-5 py-3 text-lg font-bold text-white shadow-lg shadow-indigo-700 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-600">Resume</a>
+          {/* <a href="mailto:satyajit_jbl@yahoo.com" className="text-nowrap rounded-lg border border-indigo-600 bg-black px-5 py-3 text-lg font-bold text-white shadow-lg shadow-indigo-700 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-600">Resume</a> */}
+          <a
+            href="/resume.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            download
+            className="text-nowrap rounded-lg border border-indigo-600 bg-black px-5 py-3 text-lg font-bold text-white shadow-lg shadow-indigo-700 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-600"
+          >
+            Resume
+          </a>
         </motion.div>
       </div>
-      
+
 
     </div>
   )
