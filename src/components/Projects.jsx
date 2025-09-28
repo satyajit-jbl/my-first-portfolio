@@ -1,3 +1,4 @@
+import PropTypes from "prop-types"; //using proptypes to satisfy ESLint and ensure you pass the correct props
 import { motion } from "framer-motion";
 
 const image1 = "/Project (1).PNG";
@@ -91,4 +92,15 @@ export const Projects = () => {
             </div>
         </div>
     );
+};
+
+//using proptypes to satisfy ESLint and ensure you pass the correct props
+ProjectCard.propTypes = {
+  project: PropTypes.shape({
+    image: PropTypes.string.isRequired,
+    projectsName: PropTypes.string.isRequired,
+    Description: PropTypes.string.isRequired,
+    Technologies: PropTypes.arrayOf(PropTypes.string).isRequired,
+    liveLink: PropTypes.string.isRequired,
+  }).isRequired,
 };
