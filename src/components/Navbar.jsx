@@ -19,6 +19,7 @@ export const Navbar = () => {
 
             <ul className="hidden md:flex gap-10">
                 <a href="#home" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100"><li>Home</li></a>
+                <a href="#home" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100"><li>Home</li></a>
                 <a href="#tech" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100"><li>Tech</li></a>
                 <a href="#projects" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100"><li>Projects</li></a>
                 <a href="#about" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100"><li>About Me</li></a>
