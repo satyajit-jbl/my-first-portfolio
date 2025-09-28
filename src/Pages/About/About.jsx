@@ -1,7 +1,8 @@
-import image from "../../public/profilePic2.jpg";
+// import image from "../../public/profilePic2.jpg";
+import image from "../../assets/profilePic2.jpg"
 import { motion } from "framer-motion";
 
-export const AboutMe = () => {
+export const About = () => {
   return (
     <div id="about" className="px-6 md:px-16 flex flex-col md:flex-row items-center w-full justify-center py-5">
       {/* Profile Image */}
