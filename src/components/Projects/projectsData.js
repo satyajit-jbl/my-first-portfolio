@@ -10,6 +10,10 @@ import p3_1 from "../../assets/project-3.png";
 import p3_2 from "../../assets/project-3-2.png";
 import p3_3 from "../../assets/project-3-3.png";
 
+import p4_1 from "../../assets/project-4.png"; // Chatya image
+import p4_2 from "../../assets/project-4-2.png"; // optional
+import p4_3 from "../../assets/project-4-3.png"; // optional
+
 export const projectsData = [
   {
     image: p1_1,
@@ -52,5 +56,19 @@ export const projectsData = [
     liveLink: "https://email-password-auth-696c1.firebaseapp.com/",
     githubClient: "https://github.com/satyajit-jbl/critique-client",
     githubServer: "https://github.com/satyajit-jbl/critique-server"
+  },
+  {
+    image: p4_1,
+    projectsName: "Chatya",
+    Description: "Real-Time Chat Application leveraging Socket.io.",
+    longDescription: "Chatya is a modern, responsive real-time chat application built with the MERN stack. It leverages Socket.io for instant messaging, provides secure authentication, and includes online presence indicators. Styled with TailwindCSS and Daisy UI, Chatya delivers a smooth and engaging user experience.",
+    Technologies: ["React", "MongoDB", "Socket.io", "Zustand"],
+    challenges: "Ensuring low-latency real-time communication and secure authentication for multiple users.",
+    users: "General users who want instant messaging features.",
+    images: [p4_1, p4_2, p4_3],
+    futurePlan: "Add video call functionality and improve group chat management.",
+    liveLink: "https://chatappdeploy-tyld.onrender.com/", // replace with actual link
+    githubClient: "https://github.com/satyajit-jbl/chatAppDeploy",
+    githubServer: "https://github.com/satyajit-jbl/chatAppDeploy"
   }
 ];

@@ -17,7 +17,7 @@ export const EducationalQualification = () => {
   ];
 
   return (
-    <div id="education" className="px-6 md:px-16 flex flex-col items-center w-full justify-center py-5">
+    <div id="education" className="px-6 md:px-16 flex flex-col items-center w-full justify-center py-20">
       <h2 className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent text-4xl md:text-6xl mb-10">
         My Education
       </h2>
@@ -32,8 +32,8 @@ export const EducationalQualification = () => {
           >
             <h3 className="text-2xl font-bold text-indigo-400">{edu.degree}</h3>
             <p className="text-lg text-gray-300">{edu.field}</p>
-            <p className="text-md text-gray-400">{edu.institution}</p>
-            <p className="text-sm text-gray-500">{edu.year}</p>
+            {/* <p className="text-md text-gray-400">{edu.institution}</p>
+            <p className="text-sm text-gray-500">{edu.year}</p> */}
           </motion.div>
         ))}
       </div>
