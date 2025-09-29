@@ -15,6 +15,7 @@ import Marathon from "../Pages/Activities/Marathon";
 import PlantedTank from "../Pages/Activities/PlantedTank";
 import Achievements from "../Pages/Achievements/Achievements";
 import { Contact } from "../components/Contact";
+import { Hobby } from "../Pages/Hobby/Hobby";
 
 export const router = createBrowserRouter([
   {
@@ -29,6 +30,7 @@ export const router = createBrowserRouter([
       { path: "/planted-tank", element: <PlantedTank /> },
       { path: "/achievements", element: <Achievements /> },
       { path: "/contact", element: <Contact /> },
+      { path: "/hobby", element: <Hobby /> },
     ],
   },
 ]);

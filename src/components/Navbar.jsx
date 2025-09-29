@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BiMenu, BiX } from "react-icons/bi";
 import { BsGithub, BsLinkedin, BsTwitter, BsYoutube } from "react-icons/bs";
+import { HashLink } from 'react-router-hash-link';
 
 export const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -21,18 +22,33 @@ export const Navbar = () => {
 
             {/* Desktop Menu */}
             <ul className="hidden md:flex gap-10 items-center">
-                <a href="#home" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100">
+                {/* <a href="/#home" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100">
                     <li>Home</li>
                 </a>
-                <a href="#tech" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100">
+                <a href="/#tech" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100">
                     <li>Tech</li>
                 </a>
-                <a href="#projects" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100">
+                <a href="/#projects" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100">
                     <li>Projects</li>
                 </a>
-                <a href="#about" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100">
+                <a href="/#about" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100">
                     <li>About Me</li>
-                </a>
+                </a> */}
+                <HashLink smooth to="/#home" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100">
+                    <li>Home</li>
+                </HashLink>
+                <HashLink smooth to="/#tech" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100">
+                    <li>Tech</li>
+                </HashLink>
+                <HashLink smooth to="/#projects" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100">
+                    <li>Projects</li>
+                </HashLink>
+                <HashLink smooth to="/#about" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100">
+                    <li>About Me</li>
+                </HashLink>
+                <HashLink smooth to="/hobby" className="cursor-pointer opacity-70 transition-all duration-300 hover:opacity-100">
+                    <li>Hobby</li>
+                </HashLink>
 
                 {/* Hobby Dropdown */}
                 <li
@@ -118,17 +134,17 @@ export const Navbar = () => {
               )}
             </li> */}
                         {/* Hobby Dropdown slowly */}
-<li className="relative group cursor-pointer opacity-70 transition-opacity duration-300 hover:opacity-100">
-  Hobby
-  <ul className="absolute left-0 mt-2 w-44 flex-col rounded-lg bg-black/90 p-3 shadow-lg
+                        <li className="relative group cursor-pointer opacity-70 transition-opacity duration-300 hover:opacity-100">
+                            Hobby
+                            <ul className="absolute left-0 mt-2 w-44 flex-col rounded-lg bg-black/90 p-3 shadow-lg
                  opacity-0 invisible group-hover:opacity-100 group-hover:visible
                  transition-all duration-500 ease-in-out">
-    <a href="/hobby/numismatics" className="hover:text-blue-400"><li>Numismatics</li></a>
-    <a href="/hobby/philately" className="hover:text-blue-400"><li>Philately</li></a>
-    <a href="/hobby/marathon" className="hover:text-blue-400"><li>Marathon</li></a>
-    <a href="/hobby/planted-tank" className="hover:text-blue-400"><li>Planted Tank</li></a>
-  </ul>
-</li>
+                                <a href="/hobby/numismatics" className="hover:text-blue-400"><li>Numismatics</li></a>
+                                <a href="/hobby/philately" className="hover:text-blue-400"><li>Philately</li></a>
+                                <a href="/hobby/marathon" className="hover:text-blue-400"><li>Marathon</li></a>
+                                <a href="/hobby/planted-tank" className="hover:text-blue-400"><li>Planted Tank</li></a>
+                            </ul>
+                        </li>
 
                         {/* Hobby Dropdown */}
                         {/* <li className="relative group cursor-pointer opacity-70 transition-opacity duration-300 hover:opacity-100">
