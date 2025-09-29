@@ -19,7 +19,7 @@ export const EducationalQualification = () => {
   return (
     <div id="education" className="px-6 md:px-16 flex flex-col items-center w-full justify-center py-5">
       <h2 className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent text-4xl md:text-6xl mb-10">
-        Educational Qualification
+        My Education
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
         {educationData.map((edu, index) => (

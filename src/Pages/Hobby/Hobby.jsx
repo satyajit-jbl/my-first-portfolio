@@ -27,7 +27,7 @@ const hobbies = [
     title: "Running",
     description: "Chasing goals, endurance, and freedom through the art of long-distance running.",
     image: "/assets/run.jpg",
-    link: "/run",
+    link: "/Marathon",
   },
 ];
 
@@ -49,7 +49,8 @@ export const Hobby = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white min-h-screen">
+    // <div className="bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white min-h-screen">
+    <div className=" text-white min-h-screen">
       {/* Hero Section */}
       <section className="text-center py-16">
         <motion.h1
@@ -67,7 +68,7 @@ export const Hobby = () => {
       </section>
 
       {/* Achievements Carousel */}
-      <section className="max-w-3xl mx-auto mb-16">
+      {/* <section className="max-w-3xl mx-auto mb-16">
         <Slider {...settings}>
           {achievements.map((ach, idx) => (
             <div key={idx} className="px-6">
@@ -82,7 +83,7 @@ export const Hobby = () => {
             </div>
           ))}
         </Slider>
-      </section>
+      </section> */}
 
       {/* Hobby Cards */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-8 pb-20">
