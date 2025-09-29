@@ -19,7 +19,10 @@ export const Hero = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
           className="flex max-w-[600px] flex-col items-center justify-center gap-3 text-center">
-          <h1 className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent text-5xl md:text-7xl ">Satyajit Ghosh</h1>
+          <h1 className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent font-bold whitespace-nowrap text-[clamp(2rem,5vw,5rem)]">
+            Satyajit Ghosh
+          </h1>
+          {/* <h1 className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent text-5xl md:text-7xl ">Satyajit Ghosh</h1> */}
           <h3 className="bg-gradient-to-r from-pink-500 to-blue-500 bg-clip-text text-transparent text-2xl md:text-3xl ">Fullstack Developer</h3>
           {/* <p className="md:text-base text-pretty text-sm text-gray-400">
             A passionate front-end developer with a background in Mathematics & MBA(Finance), I transitioned into web development out of a deep love for designing engaging
