@@ -26,12 +26,8 @@ export default function Numismatics() {
   ];
 
   const exhibitions = [
-    { src: "https://i.ibb.co.com/LD7ZM9WG/486047617-2485898645096202-5650044667561579432-n.jpg", title: "National Expo 2023", description: "Displayed my collection in National Expo 2023." },
-    { src: "https://i.ibb.co.com/HTKjncwF/486149599-2485898778429522-3350468653833891524-n.jpg", title: "Coin Fair 2022", description: "Participated in Coin Fair 2022." },
-    { src: "https://i.ibb.co.com/KzXRbz96/486358170-2485900928429307-2040540739743879862-n.jpg", title: "Coin Fair 2022", description: "Participated in Coin Fair 2022." },
-    { src: "https://i.ibb.co.com/ynvh2S3m/486543094-2485900785095988-7747044204479381236-n.jpg", title: "Coin Fair 2022", description: "Participated in Coin Fair 2022." },
-    { src: "https://i.ibb.co.com/4g8J11rd/486107473-2485898735096193-1881747041053549122-n.jpg", title: "Coin Fair 2022", description: "Participated in Coin Fair 2022." },
-    { src: "https://i.ibb.co.com/fzrQQ5c6/499439112-2540376179648448-5170119160465493533-n.jpg", title: "Coin Fair 2022", description: "Participated in Coin Fair 2022." },
+    { src: "https://i.ibb.co/your-exhibition1.jpg", title: "National Expo 2023", description: "Displayed my collection in National Expo 2023." },
+    { src: "https://i.ibb.co/your-exhibition2.jpg", title: "Coin Fair 2022", description: "Participated in Coin Fair 2022." },
   ];
 
   // Lightbox state
@@ -119,9 +115,7 @@ export default function Numismatics() {
         <h1 className="text-4xl md:text-6xl font-bold text-center mb-6 text-purple-400">
           Exhibitions
         </h1>
-        {/* <Marquee images={exhibitions} width="w-64 md:w-80" height="h-64 md:h-80" /> */}
-        <Marquee images={exhibitions} width="w-[20rem] md:w-[28rem]" height="h-64 md:h-80" />
-        {/* <Marquee images={exhibitions} wwidth="w-[20rem] md:w-[28rem]" height="h-64 md:h-80" /> */}
+        <Marquee images={exhibitions} width="w-64 md:w-80" height="h-64 md:h-80" />
       </section>
 
       {/* Lightbox Modal */}
@@ -139,42 +133,18 @@ export default function Numismatics() {
           </button>
 
           {/* Previous / Next */}
-          {/* <button
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white sm:text-6xl md:text-7xl lg:text-9xl font-bold hover:text-blue-400"
-            onClick={prevImage}
-          >
-            ‹
-          </button> */}
           <button
-            className="
-    absolute left-4 top-1/2 transform -translate-y-1/2
-    text-white font-bold hover:text-blue-400
-    text-4xl sm:text-6xl md:text-7xl lg:text-9xl
-    p-1 sm:p-2 md:p-3 lg:p-4
-  "
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl font-bold hover:text-blue-400"
             onClick={prevImage}
           >
             ‹
           </button>
-
-          {/* <button
+          <button
             className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl font-bold hover:text-blue-400"
             onClick={nextImage}
           >
             ›
-          </button> */}
-          <button
-            className="
-    absolute right-4 top-1/2 transform -translate-y-1/2
-    text-white font-bold hover:text-blue-400
-    text-4xl sm:text-6xl md:text-7xl lg:text-9xl
-    p-1 sm:p-2 md:p-3 lg:p-4
-  "
-            onClick={nextImage}
-          >
-            ›
           </button>
-
 
           {/* Image + Title/Description */}
           <div className="flex flex-col items-center w-full max-w-5xl overflow-y-auto modal-scrollbar">

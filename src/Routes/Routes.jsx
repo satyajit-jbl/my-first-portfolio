@@ -10,7 +10,7 @@ import {Philately} from "../Pages/Activities/Philately";
 // import Contact from "../Pages/Contact/Contact";
 import { About } from "../Pages/About/About";
 // import Philately from "../Pages/Activities/Philately";
-import {Numismatics} from "../Pages/Activities/Numismatics";
+import Numismatics from "../Pages/Activities/Numismatics";
 import {Marathon} from "../Pages/Activities/Marathon";
 import {PlantedTank} from "../Pages/Activities/PlantedTank";
 import Achievements from "../Pages/Achievements/Achievements";

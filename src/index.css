@@ -17,3 +17,32 @@
 ::-webkit-scrollbar-thumb{
     background: linear-gradient(to bottom, rgb(0,62,196), rgb(164,0,153));
 }
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
+
+/* Add this in your global CSS (e.g., index.css or globals.css) */
+.modal-scrollbar::-webkit-scrollbar {
+  width: 6px; /* thin scrollbar */
+}
+
+.modal-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1); /* track color */
+  border-radius: 3px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.4); /* thumb color */
+  border-radius: 3px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.6); /* hover effect */
+}
