@@ -124,6 +124,7 @@ import philately from "../../assets/philately.jpg";
 import numismatics from "../../assets/numismatics.jpg";
 import plantedtank from "../../assets/plantedtank.jpg";
 import run from "../../assets/run.jpg";
+import photography from "../../assets/photography.jpg";
 
 const hobbies = [
   {
@@ -153,6 +154,13 @@ const hobbies = [
       "Chasing goals, endurance, and freedom through the art of long-distance running.",
     image: run,
     link: "/Marathon",
+  },
+  {
+    title: "Photography",
+    description:
+      "Chasing goals, endurance, and freedom through the art of long-distance running.",
+    image: photography,
+    link: "/photography",
   },
 ];
 

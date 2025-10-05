@@ -16,6 +16,8 @@ import {PlantedTank} from "../Pages/Activities/PlantedTank";
 import Achievements from "../Pages/Achievements/Achievements";
 import { Contact } from "../components/Contact";
 import { Hobby } from "../Pages/Hobby/Hobby";
+import Photography from "../Pages/Activities/Photography";
+import NotFound from "../Pages/NotFound";
 
 export const router = createBrowserRouter([
   {
@@ -26,11 +28,16 @@ export const router = createBrowserRouter([
       { path: "/about", element: <About /> },
       { path: "/philately", element: <Philately /> },
       { path: "/numismatics", element: <Numismatics /> },
+      { path: "/photography", element: <Photography /> },
       { path: "/marathon", element: <Marathon /> },
       { path: "/planted-tank", element: <PlantedTank /> },
       { path: "/achievements", element: <Achievements /> },
       { path: "/contact", element: <Contact /> },
       { path: "/hobby", element: <Hobby /> },
     ],
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ]);
