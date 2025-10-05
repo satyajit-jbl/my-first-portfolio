@@ -18,66 +18,57 @@
 //   );
 // }
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
-export default function NotFound() {
-  const [lastUpdated, setLastUpdated] = useState("");
+export default function MaintenancePage() {
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
-    // ✅ Attempt to fetch the last update time from your GitHub repo
-    fetch("https://api.github.com/repos/satyajit-jbl/portfolio/commits?per_page=1")
+    // Fetch the last commit date from your GitHub repo
+    fetch("https://api.github.com/repos/satyajit-jbl/my-first-portfolio/commits?per_page=1")
       .then((res) => res.json())
       .then((data) => {
-        if (data && data[0]?.commit?.committer?.date) {
-          const date = new Date(data[0].commit.committer.date);
-          setLastUpdated(date.toLocaleString("en-US", {
+        if (data && data.length > 0) {
+          const updatedDate = new Date(data[0].commit.committer.date);
+          const formatted = updatedDate.toLocaleString("en-US", {
             weekday: "long",
             year: "numeric",
             month: "long",
             day: "numeric",
             hour: "2-digit",
             minute: "2-digit",
-          }));
+            hour12: true,
+          });
+          setLastUpdated(formatted);
         }
       })
-      .catch(() => {
-        // fallback to local date if GitHub API fails
-        const local = new Date().toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        });
-        setLastUpdated(local);
-      });
+      .catch((err) => console.error("Error fetching last updated date:", err));
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white text-center px-6">
-      <img
-        src="https://cdn-icons-png.flaticon.com/512/5602/5602730.png"
-        alt="Under Maintenance"
-        className="w-40 h-40 mb-6 animate-pulse"
-      />
-      <h1 className="text-4xl md:text-5xl font-bold mb-3 text-blue-400">
-        Page Under Maintenance
+    <div className="flex flex-col items-center justify-center min-h-screen text-center bg-gray-50 px-6">
+      <h1 className="text-5xl font-extrabold text-gray-800 mb-4">
+        🚧 Site Under Maintenance 🚧
       </h1>
-      <p className="max-w-md text-gray-300 mb-6">
-        I’m continuously improving and updating this page to provide you a better experience.  
-        Please check back soon — new updates are on the way!
+      <p className="text-lg text-gray-600 mb-6">
+        I’m currently updating and improving my portfolio. Please check back soon!
       </p>
 
-      {lastUpdated && (
-        <p className="text-sm text-gray-400 mb-10 italic">
-          Last updated on: {lastUpdated}
+      {lastUpdated ? (
+        <p className="text-sm text-gray-500 mt-4">
+          Last updated on: <span className="font-medium">{lastUpdated}</span>
         </p>
+      ) : (
+        <p className="text-sm text-gray-400 mt-4 animate-pulse">Fetching latest update...</p>
       )}
 
-      <Link
-        to="/"
-        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-md transition-all"
+      <a
+        href="https://github.com/satyajit-jbl/my-first-portfolio"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-6 inline-block bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700 transition"
       >
-        Back to Home
-      </Link>
+        View Project on GitHub
+      </a>
     </div>
   );
 }
