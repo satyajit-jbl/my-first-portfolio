@@ -76,6 +76,7 @@
 
 
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function MaintenancePage() {
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -111,7 +112,7 @@ export default function MaintenancePage() {
       <div className="absolute -z-10 top-1/2 left-1/2 w-[500px] h-[500px] rounded-full bg-purple-600 opacity-30 blur-3xl animate-pulse"></div>
 
       <h1 className="text-5xl md:text-6xl font-extrabold text-white drop-shadow-lg mb-4">
-        🚧 Site Under Maintenance 🚧
+        🚧 Page Under Maintenance 🚧
       </h1>
 
       <p className="text-lg md:text-xl text-gray-200 mb-6 max-w-2xl">
@@ -129,14 +130,22 @@ export default function MaintenancePage() {
         </p>
       )}
 
-      <a
+      <Link
+        to="/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-8 inline-block bg-gradient-to-r from-indigo-600 to-purple-700 text-white px-6 py-3 rounded-xl shadow-md hover:scale-105 transition-transform duration-300"
+      >
+        Back to Home
+      </Link>
+      {/* <a
         href="https://github.com/satyajit-jbl/my-first-portfolio"
         target="_blank"
         rel="noopener noreferrer"
         className="mt-8 inline-block bg-gradient-to-r from-indigo-600 to-purple-700 text-white px-6 py-3 rounded-xl shadow-md hover:scale-105 transition-transform duration-300"
       >
         View Project on GitHub
-      </a>
+      </a> */}
     </div>
   );
 }
