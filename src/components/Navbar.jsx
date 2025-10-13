@@ -197,7 +197,7 @@ export const Navbar = () => {
         { name: "Tech", to: "/#tech" },
         { name: "Projects", to: "/#projects" },
         { name: "About Me", to: "/#about" },
-        { name: "Hobby", to: "/hobby" },
+        { name: "My Hobby", to: "/hobby" },
         { name: "Contact", to: "/#contact" },
     ];
 
