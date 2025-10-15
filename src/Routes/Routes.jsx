@@ -28,6 +28,7 @@ import PhilatelyAwards from "../Pages/Activities/Philately/PhilatelyAwards";
 import RunningEvents from "../Pages/RunningEvents";
 import StravaData from "../Pages/StravaData";
 import StravaDashboard from "../components/StravaDashboard";
+import StravaActivities from "../Pages/Activities/Marathon/StravaActivities";
 
 export const router = createBrowserRouter([
   {
@@ -73,7 +74,8 @@ export const router = createBrowserRouter([
         element: <Marathon />, children: [
           { path: "events", element: <RunningEvents /> },
           { path: "awards", element: <Awards /> },
-          { path: "strava", element: <StravaDashboard /> },
+          // { path: "strava", element: <StravaDashboard /> },
+          { path: "strava", element: <StravaActivities /> },
         ], 
       },
       { path: "/planted-tank", element: <PlantedTank /> },
