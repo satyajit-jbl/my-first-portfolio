@@ -26,9 +26,9 @@ import FirstDayCovers from "../Pages/Activities/Philately/FirstDayCovers";
 import ExpoVisit from "../Pages/Activities/Philately/ExpoVisit";
 import PhilatelyAwards from "../Pages/Activities/Philately/PhilatelyAwards";
 import RunningEvents from "../Pages/RunningEvents";
-import StravaData from "../Pages/StravaData";
+
 import StravaDashboard from "../components/StravaDashboard";
-import StravaActivities from "../Pages/Activities/Marathon/StravaActivities";
+
 import MarathonAwards from "../Pages/Activities/Marathon/MarathonAwards";
 
 export const router = createBrowserRouter([
