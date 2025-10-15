@@ -74,8 +74,8 @@ export const router = createBrowserRouter([
         element: <Marathon />, children: [
           { path: "events", element: <RunningEvents /> },
           { path: "awards", element: <Awards /> },
-          // { path: "strava", element: <StravaDashboard /> },
-          { path: "strava", element: <StravaActivities /> },
+          { path: "strava", element: <StravaDashboard /> },
+          // { path: "strava", element: <StravaActivities /> },
         ], 
       },
       { path: "/planted-tank", element: <PlantedTank /> },

@@ -1,53 +1,73 @@
+// server/index.js
 import express from "express";
-import fetch from "node-fetch"; // or globally in Node 20+
+import fetch from "node-fetch";
+import cors from "cors";
 
 const app = express();
-const PORT = 5000;
+app.use(cors());
+app.use(express.json());
 
-const CLIENT_ID = "180737";
-const CLIENT_SECRET = "2883d52f93af0cb033eeee89e86992fc4fc9ce26";
-let ACCESS_TOKEN = "YOUR_INITIAL_ACCESS_TOKEN";
-let REFRESH_TOKEN = "YOUR_REFRESH_TOKEN";
+// Load from environment
+const CLIENT_ID = process.env.STRAVA_CLIENT_ID;
+const CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
+let ACCESS_TOKEN = process.env.STRAVA_ACCESS_TOKEN;
+let REFRESH_TOKEN = process.env.STRAVA_REFRESH_TOKEN;
 
-async function refreshAccessToken() {
-  const res = await fetch(`https://www.strava.com/oauth/token`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
-      grant_type: "refresh_token",
-      refresh_token: REFRESH_TOKEN,
-    }),
-  });
-  const data = await res.json();
-  ACCESS_TOKEN = data.access_token;
-  REFRESH_TOKEN = data.refresh_token;
-  return ACCESS_TOKEN;
+// Function to refresh token
+async function refreshStravaToken() {
+  try {
+    const res = await fetch("https://www.strava.com/oauth/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        grant_type: "refresh_token",
+        refresh_token: REFRESH_TOKEN,
+      }),
+    });
+    const data = await res.json();
+    ACCESS_TOKEN = data.access_token;
+    REFRESH_TOKEN = data.refresh_token;
+    console.log("🔁 Strava token refreshed");
+  } catch (err) {
+    console.error("Failed to refresh Strava token:", err);
+  }
 }
 
+// Route to get activities
 app.get("/api/strava/activities", async (req, res) => {
   try {
-    let token = ACCESS_TOKEN;
     let response = await fetch(
-      "https://www.strava.com/api/v3/athlete/activities?per_page=50",
-      { headers: { Authorization: `Bearer ${token}` } }
+      `https://www.strava.com/api/v3/athlete/activities?per_page=30`,
+      { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
     );
 
+    // Token expired? Refresh and retry
     if (response.status === 401) {
-      // token expired → refresh
-      token = await refreshAccessToken();
+      console.log("⚠ Access token expired. Refreshing...");
+      await refreshStravaToken();
       response = await fetch(
-        "https://www.strava.com/api/v3/athlete/activities?per_page=50",
-        { headers: { Authorization: `Bearer ${token}` } }
+        `https://www.strava.com/api/v3/athlete/activities?per_page=30`,
+        { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
       );
+    }
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(errText);
     }
 
     const data = await response.json();
     res.json(data);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({
+      error: "Failed to fetch Strava activities",
+      details: err.message,
+    });
   }
 });
 
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
