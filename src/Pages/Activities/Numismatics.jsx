@@ -212,11 +212,12 @@ export default function Numismatics() {
 
       {/* Main Content / Outlet */}
       <main className="lg:w-3/4 w-full p-4 sm:p-6">
-        {location.pathname === "/numismatics" ? (
+        {/* {location.pathname === "/numismatics" ? (
           <div className="text-center text-gray-300 text-lg">Select a category to view details.</div>
         ) : (
           <Outlet />
-        )}
+        )} */}
+        <Outlet />
       </main>
     </div>
   );

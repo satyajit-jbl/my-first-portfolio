@@ -29,6 +29,7 @@ import RunningEvents from "../Pages/RunningEvents";
 import StravaData from "../Pages/StravaData";
 import StravaDashboard from "../components/StravaDashboard";
 import StravaActivities from "../Pages/Activities/Marathon/StravaActivities";
+import MarathonAwards from "../Pages/Activities/Marathon/MarathonAwards";
 
 export const router = createBrowserRouter([
   {
@@ -51,6 +52,7 @@ export const router = createBrowserRouter([
         path: "/numismatics", 
         element: <Numismatics />,
         children: [
+          {index: true, element: <Coins/>},
           { path: "coins", element: <Coins /> },
           { path: "banknotes", element: <Banknotes /> },
           { path: "awards", element: <Awards /> },
@@ -72,8 +74,9 @@ export const router = createBrowserRouter([
       { 
         path: "/marathon", 
         element: <Marathon />, children: [
+          { index: true, element: <RunningEvents /> },
           { path: "events", element: <RunningEvents /> },
-          { path: "awards", element: <Awards /> },
+          { path: "RunAwards", element: <MarathonAwards /> },
           { path: "strava", element: <StravaDashboard /> },
           // { path: "strava", element: <StravaActivities /> },
         ], 
