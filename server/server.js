@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 import express from "express";
 import cors from "cors";
 import { MongoClient, ObjectId } from "mongodb";
@@ -10,7 +12,7 @@ const app = express();
 // app.use(express.json());
 app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:5173"
+  origin: ["http://localhost:5174", "https://satyajit-ghosh.netlify.app"]
 }));
 
 const client = new MongoClient(process.env.MONGODB_URI);
