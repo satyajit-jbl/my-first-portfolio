@@ -30,6 +30,7 @@ import RunningEvents from "../Pages/RunningEvents";
 import StravaDashboard from "../components/StravaDashboard";
 
 import MarathonAwards from "../Pages/Activities/Marathon/MarathonAwards";
+import RunningEventsUpdate from "../Pages/Activities/Marathon/RunningEventsUpdate";
 
 export const router = createBrowserRouter([
   {
@@ -78,6 +79,7 @@ export const router = createBrowserRouter([
           { path: "events", element: <RunningEvents /> },
           { path: "RunAwards", element: <MarathonAwards /> },
           { path: "strava", element: <StravaDashboard /> },
+          { path: "update", element: <RunningEventsUpdate /> },
           // { path: "strava", element: <StravaActivities /> },
         ], 
       },

@@ -25,3 +25,12 @@ dist-ssr
 *.sw?
 StravaDashboard_frontend_workingmodal.jsx
 *_bk*
+
+# Node modules
+server/node_modules
+
+# Build output
+server/dist
+
+# Env files
+server/.env

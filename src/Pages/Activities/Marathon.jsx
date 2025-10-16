@@ -54,6 +54,8 @@ export default function Marathon() {
           <li><Link to="/marathon/events" className="hover:text-yellow-300">🏃‍♂️ Running Events</Link></li>
           <li><Link to="/marathon/RunAwards" className="hover:text-green-300">🏆 Awards & Appreciations</Link></li>
           <li><Link to="/marathon/strava" className="hover:text-indigo-300">📊 Strava Dashboard</Link></li>
+          <li><Link to="/marathon/update" className="hover:text-orange-300">🗓️ Running Events Update</Link></li>
+
         </ul>
 
         <Link to="/hobby" className="mt-4 inline-block bg-yellow-400 hover:bg-yellow-500 text-black text-center py-2 rounded-lg text-sm md:text-base transition">
