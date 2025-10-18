@@ -1,34 +1,34 @@
 import { useEffect, useState } from "react";
+import { BASE_URL } from "../../../utils/config";
 
 export default function RunningEventsUpdate() {
-  const BASE_URL = "http://localhost:5000/api/events"; // 🔁 change to your backend
   const [events, setEvents] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     date: "",
     location: "",
-    distance: "",
+    distance: "5k",
     organizer: "",
     registrationDeadline: "",
     registrationLink: "",
   });
   const [editId, setEditId] = useState(null);
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [loading, setLoading] = useState(false);
 
-  // Fetch all events
+  // ✅ Fetch approved events
   const fetchEvents = async () => {
     try {
-      const res = await fetch(BASE_URL);
+      setLoading(true);
+      const res = await fetch(`${BASE_URL}/events`);
       const data = await res.json();
-      // Sort by date (upcoming first)
-      const sorted = data.sort(
-        (a, b) => new Date(a.date) - new Date(b.date)
-      );
-      setEvents(sorted);
+
+      // Sort by date ascending
+      data.sort((a, b) => new Date(a.date) - new Date(b.date));
+      setEvents(data);
     } catch (err) {
       console.error("Error fetching events:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -37,24 +37,31 @@ export default function RunningEventsUpdate() {
   }, []);
 
   const handleChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
+  // ✅ Add or Update Event (pending)
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const method = editId ? "PUT" : "POST";
-    const url = editId ? `${BASE_URL}/${editId}` : BASE_URL;
-
     try {
-      await fetch(url, {
+      const method = editId ? "PUT" : "POST";
+      const url = editId
+        ? `${BASE_URL}/events/${editId}`
+        : `${BASE_URL}/events`;
+
+      const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+
+      const data = await res.json();
+      alert(data.message);
+
       setFormData({
         name: "",
         date: "",
         location: "",
-        distance: "",
+        distance: "5k",
         organizer: "",
         registrationDeadline: "",
         registrationLink: "",
@@ -63,226 +70,210 @@ export default function RunningEventsUpdate() {
       fetchEvents();
     } catch (err) {
       console.error("Error saving event:", err);
+      alert("Failed to submit. Check console.");
     }
   };
 
-  const handleEdit = (event) => {
-    setFormData(event);
-    setEditId(event._id);
+  // ✅ Prepare edit form
+  const handleEdit = (ev) => {
+    const source =
+      ev.pendingAction === "update" && ev.pendingData ? ev.pendingData : ev;
+    setFormData({
+      name: source.name || "",
+      date: source.date || "",
+      location: source.location || "",
+      distance: source.distance || "5k",
+      organizer: source.organizer || "",
+      registrationDeadline: source.registrationDeadline || "",
+      registrationLink: source.registrationLink || "",
+    });
+    setEditId(ev._id);
+    alert(
+      "⚡ Your changes will be submitted as pending and will require admin approval."
+    );
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this event?")) return;
+  // ✅ Request deletion (pending)
+  const requestDelete = async (id) => {
+    if (!confirm("Request deletion? This will await admin approval.")) return;
     try {
-      await fetch(`${BASE_URL}/${id}`, { method: "DELETE" });
+      const res = await fetch(`${BASE_URL}/events/${id}/request`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      alert(data.message);
       fetchEvents();
     } catch (err) {
-      console.error("Error deleting event:", err);
+      console.error(err);
+      alert("Failed to request deletion");
     }
   };
 
-  // Search filter
-  const filteredEvents = events.filter(
-    (e) =>
-      e.name.toLowerCase().includes(search.toLowerCase()) ||
-      e.location.toLowerCase().includes(search.toLowerCase()) ||
-      e.organizer.toLowerCase().includes(search.toLowerCase())
-  );
-
-  // Pagination
-  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
-  const paginated = filteredEvents.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const today = new Date();
-
   return (
-    <div className="text-gray-200">
-      <h2 className="text-2xl font-semibold mb-6 text-yellow-400 text-center">
-        🏃 Running Events Update
-      </h2>
+    <div className="min-h-screen p-4 bg-[#0f172a] text-gray-100">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6 text-yellow-400 text-center">
+          🏃‍♂️ Running Events
+        </h1>
 
-      {/* Form */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-gray-800 p-6 rounded-lg mb-8 flex flex-col gap-4 max-w-2xl mx-auto"
-      >
-        <div className="grid md:grid-cols-2 gap-4">
-          <input
-            type="text"
-            name="name"
-            placeholder="Event Name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            className="p-2 rounded bg-gray-700 text-gray-100"
-          />
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            required
-            className="p-2 rounded bg-gray-700 text-gray-100"
-          />
-          <input
-            type="text"
-            name="location"
-            placeholder="Location"
-            value={formData.location}
-            onChange={handleChange}
-            required
-            className="p-2 rounded bg-gray-700 text-gray-100"
-          />
-          <input
-            type="text"
-            name="distance"
-            placeholder="Type (5K, 10K, Half Marathon)"
-            value={formData.distance}
-            onChange={handleChange}
-            required
-            className="p-2 rounded bg-gray-700 text-gray-100"
-          />
-          <input
-            type="text"
-            name="organizer"
-            placeholder="Organized By"
-            value={formData.organizer}
-            onChange={handleChange}
-            className="p-2 rounded bg-gray-700 text-gray-100"
-          />
-          <input
-            type="date"
-            name="registrationDeadline"
-            value={formData.registrationDeadline}
-            onChange={handleChange}
-            required
-            className="p-2 rounded bg-gray-700 text-gray-100"
-          />
-        </div>
-
-        <input
-          type="url"
-          name="registrationLink"
-          placeholder="Registration Link (https://...)"
-          value={formData.registrationLink}
-          onChange={handleChange}
-          required
-          className="p-2 rounded bg-gray-700 text-gray-100"
-        />
-
-        <button
-          type="submit"
-          className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 rounded transition"
+        {/* FORM */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-[#0b1220] p-6 rounded-lg shadow-md mb-6"
         >
-          {editId ? "Update Event" : "Add Event"}
-        </button>
-      </form>
+          <div className="grid gap-3 sm:grid-cols-1 md:grid-cols-2">
+            <input
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Event Name"
+              required
+              className="p-2 rounded bg-[#0f1724]"
+            />
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleChange}
+              required
+              className="p-2 rounded bg-[#0f1724]"
+            />
+            <input
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              placeholder="Location"
+              required
+              className="p-2 rounded bg-[#0f1724]"
+            />
+            <select
+              name="distance"
+              value={formData.distance}
+              onChange={handleChange}
+              className="p-2 rounded bg-[#0f1724]"
+            >
+              <option value="5k">5K</option>
+              <option value="7k">7K</option>
+              <option value="10k">10K</option>
+              <option value="half">Half Marathon</option>
+              <option value="full">Full Marathon</option>
+            </select>
+            <input
+              name="organizer"
+              value={formData.organizer}
+              onChange={handleChange}
+              placeholder="Organizer"
+              className="p-2 rounded bg-[#0f1724]"
+            />
+            <input
+              type="date"
+              name="registrationDeadline"
+              value={formData.registrationDeadline}
+              onChange={handleChange}
+              required
+              className="p-2 rounded bg-[#0f1724]"
+            />
+          </div>
 
-      {/* Search */}
-      <div className="flex justify-between items-center mb-4 max-w-4xl mx-auto">
-        <input
-          type="text"
-          placeholder="Search by name, location, or organizer..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="bg-gray-700 p-2 rounded w-full md:w-1/2"
-        />
-      </div>
+          <input
+            name="registrationLink"
+            value={formData.registrationLink}
+            onChange={handleChange}
+            placeholder="Registration Link (https://...)"
+            type="url"
+            className="mt-3 p-2 rounded bg-[#0f1724] w-full"
+          />
 
-      {/* Table */}
-      <div className="overflow-x-auto max-w-6xl mx-auto">
-        <table className="min-w-full border border-gray-600 text-sm md:text-base">
-          <thead className="bg-gray-700 text-yellow-400">
-            <tr>
-              <th className="p-3 text-left">Event Name</th>
-              <th className="p-3 text-left">Date</th>
-              <th className="p-3 text-left">Location</th>
-              <th className="p-3 text-left">Type</th>
-              <th className="p-3 text-left">Organized By</th>
-              <th className="p-3 text-left">Registration Deadline</th>
-              <th className="p-3 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginated.map((event) => {
-              const deadline = new Date(event.registrationDeadline);
-              const isExpired = deadline < today;
-
-              return (
-                <tr
-                  key={event._id}
-                  className={`border-t border-gray-700 ${
-                    isExpired ? "bg-red-900/40" : "hover:bg-gray-800"
-                  }`}
-                >
-                  <td className="p-3">
-                    <a
-                      href={event.registrationLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:underline"
-                    >
-                      {event.name}
-                    </a>
-                  </td>
-                  <td className="p-3">{event.date}</td>
-                  <td className="p-3">{event.location}</td>
-                  <td className="p-3">{event.distance}</td>
-                  <td className="p-3">{event.organizer}</td>
-                  <td className="p-3">
-                    {event.registrationDeadline}{" "}
-                    {isExpired && (
-                      <span className="ml-2 text-red-400 font-semibold">
-                        ⏰ Closed
-                      </span>
-                    )}
-                  </td>
-                  <td className="p-3 flex gap-2">
-                    <button
-                      onClick={() => handleEdit(event)}
-                      className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded text-white"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(event._id)}
-                      className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-white"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-            {paginated.length === 0 && (
-              <tr>
-                <td colSpan="7" className="text-center p-4 text-gray-400">
-                  No matching events found.
-                </td>
-              </tr>
+          <div className="flex gap-2 mt-4">
+            <button
+              type="submit"
+              className="bg-yellow-400 text-black px-4 py-2 rounded font-semibold"
+            >
+              {editId ? "Submit Update (pending)" : "Add Event (pending)"}
+            </button>
+            {editId && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditId(null);
+                  setFormData({
+                    name: "",
+                    date: "",
+                    location: "",
+                    distance: "5k",
+                    organizer: "",
+                    registrationDeadline: "",
+                    registrationLink: "",
+                  });
+                }}
+                className="bg-gray-600 px-3 py-2 rounded"
+              >
+                Cancel
+              </button>
             )}
-          </tbody>
-        </table>
-      </div>
+          </div>
+        </form>
 
-      {/* Pagination */}
-      <div className="flex justify-center gap-2 mt-6">
-        {[...Array(totalPages).keys()].map((i) => (
-          <button
-            key={i}
-            onClick={() => setCurrentPage(i + 1)}
-            className={`px-3 py-1 rounded ${
-              currentPage === i + 1
-                ? "bg-yellow-500 text-black"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-            }`}
-          >
-            {i + 1}
-          </button>
-        ))}
+        {/* EVENTS TABLE */}
+        <div className="bg-[#071128] p-4 rounded-lg shadow">
+          <h2 className="text-xl mb-3">Upcoming events</h2>
+          {loading ? (
+            <p>Loading...</p>
+          ) : events.length === 0 ? (
+            <p>No events yet.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left">
+                <thead className="text-yellow-400">
+                  <tr>
+                    <th className="p-2">Name</th>
+                    <th className="p-2">Date</th>
+                    <th className="p-2">Location</th>
+                    <th className="p-2">Type</th>
+                    <th className="p-2">Organizer</th>
+                    <th className="p-2">Deadline</th>
+                    <th className="p-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {events.map((ev) => (
+                    <tr key={ev._id} className="border-t border-gray-700">
+                      <td className="p-2">
+                        <a
+                          href={ev.registrationLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-blue-300 hover:underline"
+                        >
+                          {ev.name}
+                        </a>
+                      </td>
+                      <td className="p-2">{ev.date}</td>
+                      <td className="p-2">{ev.location}</td>
+                      <td className="p-2">{ev.distance}</td>
+                      <td className="p-2">{ev.organizer}</td>
+                      <td className="p-2">{ev.registrationDeadline}</td>
+                      <td className="p-2 flex gap-2">
+                        <button
+                          onClick={() => handleEdit(ev)}
+                          className="bg-blue-500 px-3 py-1 rounded"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => requestDelete(ev._id)}
+                          className="bg-red-500 px-3 py-1 rounded"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -34,3 +34,4 @@ server/dist
 
 # Env files
 server/.env
+.env.production
