@@ -7,13 +7,23 @@ export default function RunningEventsUpdate() {
     name: "",
     date: "",
     location: "",
-    distance: "5k",
+    distance: [],
     organizer: "",
     registrationDeadline: "",
     registrationLink: "",
   });
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [filter, setFilter] = useState({
+    name: "",
+    location: "",
+    type: "",
+    distance: "",
+  });
+
+  // ✅ Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const eventsPerPage = 5;
 
   // ✅ Fetch approved events
   const fetchEvents = async () => {
@@ -36,10 +46,27 @@ export default function RunningEventsUpdate() {
     fetchEvents();
   }, []);
 
+  // ✅ Reset page to 1 when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
+
   const handleChange = (e) =>
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  // ✅ Add or Update Event (pending)
+  // ✅ Handle multiple checkbox selection for distance
+  const handleDistanceChange = (e) => {
+    const value = e.target.value;
+    setFormData((prev) => {
+      if (prev.distance.includes(value)) {
+        return { ...prev, distance: prev.distance.filter((d) => d !== value) };
+      } else {
+        return { ...prev, distance: [...prev.distance, value] };
+      }
+    });
+  };
+
+  // ✅ Add or Update Event
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -61,7 +88,7 @@ export default function RunningEventsUpdate() {
         name: "",
         date: "",
         location: "",
-        distance: "5k",
+        distance: [],
         organizer: "",
         registrationDeadline: "",
         registrationLink: "",
@@ -82,7 +109,9 @@ export default function RunningEventsUpdate() {
       name: source.name || "",
       date: source.date || "",
       location: source.location || "",
-      distance: source.distance || "5k",
+      distance: Array.isArray(source.distance)
+        ? source.distance
+        : [source.distance || ""],
       organizer: source.organizer || "",
       registrationDeadline: source.registrationDeadline || "",
       registrationLink: source.registrationLink || "",
@@ -93,7 +122,7 @@ export default function RunningEventsUpdate() {
     );
   };
 
-  // ✅ Request deletion (pending)
+  // ✅ Request deletion
   const requestDelete = async (id) => {
     if (!confirm("Request deletion? This will await admin approval.")) return;
     try {
@@ -109,9 +138,60 @@ export default function RunningEventsUpdate() {
     }
   };
 
+  // ✅ Distance badge helpers
+  const getDistanceLabel = (dist) => {
+    if (dist === "half") return "21k";
+    if (dist === "full") return "42k";
+    return dist.toUpperCase();
+  };
+
+  const getBadgeColor = (dist) => {
+    switch (dist) {
+      case "5k":
+        return "bg-green-600";
+      case "7k":
+        return "bg-blue-600";
+      case "10k":
+        return "bg-purple-600";
+      case "half":
+        return "bg-orange-600";
+      case "full":
+        return "bg-red-600";
+      default:
+        return "bg-gray-600";
+    }
+  };
+
+  // ✅ Apply filters
+  const filteredEvents = events.filter((ev) => {
+    const matchesName = ev.name
+      ?.toLowerCase()
+      .includes(filter.name.toLowerCase());
+    const matchesLocation = ev.location
+      ?.toLowerCase()
+      .includes(filter.location.toLowerCase());
+    const matchesType = filter.type
+      ? ev.type?.toLowerCase() === filter.type.toLowerCase()
+      : true;
+    const matchesDistance = filter.distance
+      ? Array.isArray(ev.distance)
+        ? ev.distance.includes(filter.distance)
+        : ev.distance === filter.distance
+      : true;
+    return matchesName && matchesLocation && matchesType && matchesDistance;
+  });
+
+  // ✅ Pagination logic
+  const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
+  const startIndex = (currentPage - 1) * eventsPerPage;
+  const currentEvents = filteredEvents.slice(
+    startIndex,
+    startIndex + eventsPerPage
+  );
+
   return (
-    <div className="min-h-screen p-4 bg-[#0f172a] text-gray-100">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen p-4 text-gray-100">
+      <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-yellow-400 text-center">
           🏃‍♂️ Running Events
         </h1>
@@ -146,18 +226,23 @@ export default function RunningEventsUpdate() {
               required
               className="p-2 rounded bg-[#0f1724]"
             />
-            <select
-              name="distance"
-              value={formData.distance}
-              onChange={handleChange}
-              className="p-2 rounded bg-[#0f1724]"
-            >
-              <option value="5k">5K</option>
-              <option value="7k">7K</option>
-              <option value="10k">10K</option>
-              <option value="half">Half Marathon</option>
-              <option value="full">Full Marathon</option>
-            </select>
+
+            {/* ✅ Multi distance checkboxes */}
+            <div className="flex flex-wrap gap-3 bg-[#0f1724] p-2 rounded">
+              {["5k", "7k", "10k", "half", "full"].map((dist) => (
+                <label key={dist} className="flex items-center gap-1">
+                  <input
+                    type="checkbox"
+                    value={dist}
+                    checked={formData.distance.includes(dist)}
+                    onChange={handleDistanceChange}
+                    className="accent-yellow-400"
+                  />
+                  <span className="capitalize">{getDistanceLabel(dist)}</span>
+                </label>
+              ))}
+            </div>
+
             <input
               name="organizer"
               value={formData.organizer}
@@ -200,7 +285,7 @@ export default function RunningEventsUpdate() {
                     name: "",
                     date: "",
                     location: "",
-                    distance: "5k",
+                    distance: [],
                     organizer: "",
                     registrationDeadline: "",
                     registrationLink: "",
@@ -214,64 +299,168 @@ export default function RunningEventsUpdate() {
           </div>
         </form>
 
+        {/* ✅ FILTER BAR */}
+        <div className="bg-[#0b1220] p-4 mb-6 rounded-lg flex flex-wrap gap-3 justify-center">
+          <input
+            type="text"
+            placeholder="Search by name"
+            value={filter.name}
+            onChange={(e) => setFilter({ ...filter, name: e.target.value })}
+            className="p-2 rounded bg-[#0f1724]"
+          />
+          <input
+            type="text"
+            placeholder="Search by location"
+            value={filter.location}
+            onChange={(e) => setFilter({ ...filter, location: e.target.value })}
+            className="p-2 rounded bg-[#0f1724]"
+          />
+          <select
+            value={filter.type}
+            onChange={(e) => setFilter({ ...filter, type: e.target.value })}
+            className="p-2 rounded bg-[#0f1724]"
+          >
+            <option value="">All Types</option>
+            <option value="trail">Trail</option>
+            <option value="road">Road</option>
+            <option value="fun-run">Fun Run</option>
+          </select>
+          <select
+            value={filter.distance}
+            onChange={(e) =>
+              setFilter({ ...filter, distance: e.target.value })
+            }
+            className="p-2 rounded bg-[#0f1724]"
+          >
+            <option value="">All Distances</option>
+            {["5k", "7k", "10k", "half", "full"].map((d) => (
+              <option key={d} value={d}>
+                {getDistanceLabel(d)}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* EVENTS TABLE */}
         <div className="bg-[#071128] p-4 rounded-lg shadow">
           <h2 className="text-xl mb-3">Upcoming events</h2>
           {loading ? (
             <p>Loading...</p>
-          ) : events.length === 0 ? (
-            <p>No events yet.</p>
+          ) : filteredEvents.length === 0 ? (
+            <p>No events found.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-left">
-                <thead className="text-yellow-400">
-                  <tr>
-                    <th className="p-2">Name</th>
-                    <th className="p-2">Date</th>
-                    <th className="p-2">Location</th>
-                    <th className="p-2">Type</th>
-                    <th className="p-2">Organizer</th>
-                    <th className="p-2">Deadline</th>
-                    <th className="p-2">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {events.map((ev) => (
-                    <tr key={ev._id} className="border-t border-gray-700">
-                      <td className="p-2">
-                        <a
-                          href={ev.registrationLink}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-blue-300 hover:underline"
-                        >
-                          {ev.name}
-                        </a>
-                      </td>
-                      <td className="p-2">{ev.date}</td>
-                      <td className="p-2">{ev.location}</td>
-                      <td className="p-2">{ev.distance}</td>
-                      <td className="p-2">{ev.organizer}</td>
-                      <td className="p-2">{ev.registrationDeadline}</td>
-                      <td className="p-2 flex gap-2">
-                        <button
-                          onClick={() => handleEdit(ev)}
-                          className="bg-blue-500 px-3 py-1 rounded"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => requestDelete(ev._id)}
-                          className="bg-red-500 px-3 py-1 rounded"
-                        >
-                          Delete
-                        </button>
-                      </td>
+            <>
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-left">
+                  <thead className="text-yellow-400">
+                    <tr>
+                      <th className="p-2">#</th>
+                      <th className="p-2">Name</th>
+                      <th className="p-2">Date</th>
+                      <th className="p-2">Location</th>
+                      <th className="p-2">Distance</th>
+                      <th className="p-2">Organizer</th>
+                      <th className="p-2">Deadline</th>
+                      <th className="p-2 text-center">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {currentEvents.map((ev, index) => (
+                      <tr key={ev._id} className="border-t border-gray-700">
+                        <td className="p-2">
+                          {startIndex + index + 1}
+                        </td>
+                        <td className="p-2">
+                          <a
+                            href={ev.registrationLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-blue-300 hover:underline"
+                          >
+                            {ev.name}
+                          </a>
+                        </td>
+                        <td className="p-2">{ev.date}</td>
+                        <td className="p-2">{ev.location}</td>
+                        <td className="p-2 flex flex-wrap gap-1">
+                          {Array.isArray(ev.distance)
+                            ? ev.distance.map((dist) => (
+                                <span
+                                  key={dist}
+                                  className={`${getBadgeColor(
+                                    dist
+                                  )} text-white text-xs px-2 py-1 rounded-full`}
+                                >
+                                  {getDistanceLabel(dist)}
+                                </span>
+                              ))
+                            : ev.distance}
+                        </td>
+                        <td className="p-2">{ev.organizer}</td>
+                        <td className="p-2">{ev.registrationDeadline}</td>
+                        <td className="p-2 flex justify-center gap-4">
+                          <button
+                            onClick={() => handleEdit(ev)}
+                            title="Edit"
+                            className="hover:text-blue-400 text-lg"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => requestDelete(ev._id)}
+                            title="Delete"
+                            className="hover:text-red-500 text-lg"
+                          >
+                            🗑️
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* ✅ PAGINATION CONTROLS */}
+              <div className="flex justify-center items-center gap-2 mt-4">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((prev) => prev - 1)}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === 1
+                      ? "bg-gray-600 cursor-not-allowed"
+                      : "bg-yellow-400 text-black"
+                  }`}
+                >
+                  Prev
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i + 1}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`px-3 py-1 rounded ${
+                      currentPage === i + 1
+                        ? "bg-yellow-400 text-black"
+                        : "bg-gray-700"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((prev) => prev + 1)}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === totalPages
+                      ? "bg-gray-600 cursor-not-allowed"
+                      : "bg-yellow-400 text-black"
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
+            </>
           )}
         </div>
       </div>
