@@ -3,6 +3,9 @@ import { BASE_URL } from "../../../utils/config";
 import { Edit2, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 
 // 🌌 Global SweetAlert2 Theme (Dark Blue + Glow)
 const swalTheme = Swal.mixin({
@@ -107,63 +110,63 @@ export default function RunningEventsUpdate() {
     });
   };
 
-  
-  // Add or Update Event
-const handleSubmit = async (e) => {
-  e.preventDefault();
 
-  try {
-    // 🟢 Only confirm when adding a new event
-    if (!editId) {
-      const result = await swalTheme.fire({
-        title: "Add New Event?",
-        text: "This event will be sent for admin approval.",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: "Yes, add it!",
-        cancelButtonText: "Cancel",
+  // Add or Update Event
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      // 🟢 Only confirm when adding a new event
+      if (!editId) {
+        const result = await swalTheme.fire({
+          title: "Add New Event?",
+          text: "This event will be sent for admin approval.",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Yes, add it!",
+          cancelButtonText: "Cancel",
+        });
+
+        if (!result.isConfirmed) return; // Stop if user cancels
+      }
+
+      const method = editId ? "PUT" : "POST";
+      const url = editId ? `${BASE_URL}/events/${editId}` : `${BASE_URL}/events`;
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
 
-      if (!result.isConfirmed) return; // Stop if user cancels
+      const data = await res.json();
+
+      Toast.fire({
+        icon: "success",
+        title: data.message || (editId ? "Event updated!" : "Event added!"),
+      });
+
+      // Reset form
+      setFormData({
+        name: "",
+        date: "",
+        location: "",
+        distance: [],
+        organizer: "",
+        registrationDeadline: "",
+        registrationLink: "",
+      });
+      setEditId(null);
+      fetchEvents();
+    } catch (err) {
+      console.error("Error saving event:", err);
+      swalTheme.fire({
+        title: "Error!",
+        text: "Failed to submit. Check console.",
+        icon: "error",
+      });
     }
-
-    const method = editId ? "PUT" : "POST";
-    const url = editId ? `${BASE_URL}/events/${editId}` : `${BASE_URL}/events`;
-
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-
-    const data = await res.json();
-
-    Toast.fire({
-      icon: "success",
-      title: data.message || (editId ? "Event updated!" : "Event added!"),
-    });
-
-    // Reset form
-    setFormData({
-      name: "",
-      date: "",
-      location: "",
-      distance: [],
-      organizer: "",
-      registrationDeadline: "",
-      registrationLink: "",
-    });
-    setEditId(null);
-    fetchEvents();
-  } catch (err) {
-    console.error("Error saving event:", err);
-    swalTheme.fire({
-      title: "Error!",
-      text: "Failed to submit. Check console.",
-      icon: "error",
-    });
-  }
-};
+  };
 
 
   // Prepare edit form
@@ -276,7 +279,7 @@ const handleSubmit = async (e) => {
     startIndex + eventsPerPage
   );
 
- return (
+  return (
     <div className="min-h-screen p-4 text-gray-100">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-yellow-400 text-center">
@@ -293,17 +296,31 @@ const handleSubmit = async (e) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Event Name & Date"
+              placeholder="Event Name"
               required
               className="p-2 rounded bg-[#0f1724]"
             />
-            <input
+            {/* <input
               type="date"
               name="date"
               value={formData.date}
               onChange={handleChange}
               required
               className="p-2 rounded bg-[#0f1724]"
+            /> */}
+            {/* Event Date */}
+            <DatePicker
+              selected={formData.date ? new Date(formData.date) : null}
+              onChange={(date) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  date: date.toISOString().split("T")[0],
+                }))
+              }
+              placeholderText="Select Event Date"
+              required
+              dateFormat="dd/MM/yyyy"
+              className="p-2 rounded bg-[#0f1724] text-gray-100 w-full border border-gray-700 focus:border-blue-500 focus:outline-none"
             />
             <input
               name="location"
@@ -316,13 +333,14 @@ const handleSubmit = async (e) => {
 
             {/* Distance checkboxes */}
             <div className="flex flex-wrap gap-3 bg-[#0f1724] p-2 rounded">
-              {["5k", "7k", "10k", "half", "full"].map((dist) => (
+              {["5k", "7k","8k", "10k", "half", "full"].map((dist) => (
                 <label key={dist} className="flex items-center gap-1">
                   <input
                     type="checkbox"
                     value={dist}
                     checked={formData.distance.includes(dist)}
                     onChange={handleDistanceChange}
+                    
                     className="accent-yellow-400"
                   />
                   <span className="capitalize">{getDistanceLabel(dist)}</span>
@@ -334,10 +352,10 @@ const handleSubmit = async (e) => {
               name="organizer"
               value={formData.organizer}
               onChange={handleChange}
-              placeholder="Organizer & Registration Deadline"
+              placeholder="Organizer"
               className="p-2 rounded bg-[#0f1724]"
             />
-            <input
+            {/* <input
               type="date"
               name="registrationDeadline"
               placeholder="registrationDeadline"
@@ -345,12 +363,27 @@ const handleSubmit = async (e) => {
               onChange={handleChange}
               required
               className="p-2 rounded bg-[#0f1724]"
+            /> */}
+            {/* Registration Deadline */}
+            <DatePicker
+              selected={formData.registrationDeadline ? new Date(formData.registrationDeadline) : null}
+              onChange={(date) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  registrationDeadline: date.toISOString().split("T")[0],
+                }))
+              }
+              placeholderText="Select Registration Deadline"
+              required
+              dateFormat="dd/MM/yyyy"
+              className="p-2 rounded bg-[#0f1724] text-gray-100 w-full border border-gray-700 focus:border-blue-500 focus:outline-none"
             />
           </div>
 
           <input
             name="registrationLink"
             value={formData.registrationLink}
+            required
             onChange={handleChange}
             placeholder="Registration Link (https://...)"
             type="url"
@@ -477,32 +510,31 @@ const handleSubmit = async (e) => {
                         <td className="p-2 flex flex-wrap gap-1">
                           {Array.isArray(ev.distance)
                             ? ev.distance.map((dist) => (
-                                <span
-                                  key={dist}
-                                  className={`${getBadgeColor(
-                                    dist
-                                  )} text-white text-xs px-2 py-1 rounded-full`}
-                                >
-                                  {getDistanceLabel(dist)}
-                                </span>
-                              ))
+                              <span
+                                key={dist}
+                                className={`${getBadgeColor(
+                                  dist
+                                )} text-white text-xs px-2 py-1 rounded-full`}
+                              >
+                                {getDistanceLabel(dist)}
+                              </span>
+                            ))
                             : ev.distance}
                         </td>
                         <td className="p-2">{ev.organizer}</td>
                         <td
-                          className={`p-2 ${
-                            ev.registrationDeadline &&
+                          className={`p-2 ${ev.registrationDeadline &&
                             new Date(ev.registrationDeadline) < new Date()
-                              ? "text-red-500 font-semibold"
-                              : ""
-                          }`}
+                            ? "text-red-500 font-semibold"
+                            : ""
+                            }`}
                         >
                           {ev.registrationDeadline
                             ? new Date(ev.registrationDeadline) < new Date()
                               ? "Closed"
                               : new Date(ev.registrationDeadline).toLocaleDateString(
-                                  "en-GB"
-                                )
+                                "en-GB"
+                              )
                             : "-"}
                         </td>
                         <td className="p-2 text-center align-middle">
@@ -534,11 +566,10 @@ const handleSubmit = async (e) => {
                 <button
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((prev) => prev - 1)}
-                  className={`px-3 py-1 rounded ${
-                    currentPage === 1
-                      ? "bg-gray-600 cursor-not-allowed"
-                      : "bg-yellow-400 text-black"
-                  }`}
+                  className={`px-3 py-1 rounded ${currentPage === 1
+                    ? "bg-gray-600 cursor-not-allowed"
+                    : "bg-yellow-400 text-black"
+                    }`}
                 >
                   Prev
                 </button>
@@ -547,11 +578,10 @@ const handleSubmit = async (e) => {
                   <button
                     key={i + 1}
                     onClick={() => setCurrentPage(i + 1)}
-                    className={`px-3 py-1 rounded ${
-                      currentPage === i + 1
-                        ? "bg-yellow-400 text-black"
-                        : "bg-gray-700"
-                    }`}
+                    className={`px-3 py-1 rounded ${currentPage === i + 1
+                      ? "bg-yellow-400 text-black"
+                      : "bg-gray-700"
+                      }`}
                   >
                     {i + 1}
                   </button>
@@ -560,11 +590,10 @@ const handleSubmit = async (e) => {
                 <button
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((prev) => prev + 1)}
-                  className={`px-3 py-1 rounded ${
-                    currentPage === totalPages
-                      ? "bg-gray-600 cursor-not-allowed"
-                      : "bg-yellow-400 text-black"
-                  }`}
+                  className={`px-3 py-1 rounded ${currentPage === totalPages
+                    ? "bg-gray-600 cursor-not-allowed"
+                    : "bg-yellow-400 text-black"
+                    }`}
                 >
                   Next
                 </button>

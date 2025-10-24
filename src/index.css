@@ -123,3 +123,28 @@
   transform: rotateY(180deg);
 }
 
+/* React DatePicker To match dark-blue gradient theme */
+
+.react-datepicker {
+  background-color: #0f1724 !important;
+  border: 1px solid #1e3a8a !important;
+  color: #e0e7ff !important;
+}
+
+.react-datepicker__header {
+  background-color: #0b1220 !important;
+  border-bottom: 1px solid #1e3a8a !important;
+}
+
+.react-datepicker__day,
+.react-datepicker__current-month,
+.react-datepicker__day-name {
+  color: #e0e7ff !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background: linear-gradient(145deg, #3b82f6, #06b6d4) !important;
+  color: black !important;
+}
+
