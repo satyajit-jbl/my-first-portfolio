@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { BASE_URL } from "../../../utils/config";
+import { Edit2, Trash2 } from "lucide-react";
 
 export default function RunningEventsUpdate() {
   const [events, setEvents] = useState([]);
@@ -274,7 +275,7 @@ export default function RunningEventsUpdate() {
               type="submit"
               className="bg-yellow-400 text-black px-4 py-2 rounded font-semibold"
             >
-              {editId ? "Submit Update (pending)" : "Add Event (pending)"}
+              {editId ? "Submit Update" : "Add Event"}
             </button>
             {editId && (
               <button
@@ -343,7 +344,7 @@ export default function RunningEventsUpdate() {
 
         {/* EVENTS TABLE */}
         <div className="bg-[#071128] p-4 rounded-lg shadow">
-          <h2 className="text-xl mb-3">Upcoming events</h2>
+          <h2 className="text-xl mb-3">Upcoming events(Click event name for registration)</h2>
           {loading ? (
             <p>Loading...</p>
           ) : filteredEvents.length === 0 ? (
@@ -354,8 +355,8 @@ export default function RunningEventsUpdate() {
                 <table className="min-w-full text-left">
                   <thead className="text-yellow-400">
                     <tr>
-                      <th className="p-2">#</th>
-                      <th className="p-2">Name</th>
+                      <th className="p-2">Sl</th>
+                      <th className="p-2">Event Name</th>
                       <th className="p-2">Date</th>
                       <th className="p-2">Location</th>
                       <th className="p-2">Distance</th>
@@ -380,40 +381,63 @@ export default function RunningEventsUpdate() {
                             {ev.name}
                           </a>
                         </td>
-                        <td className="p-2">{ev.date}</td>
+                        {/* <td className="p-2">{ev.date}</td> */}
+                        <td className="p-2">
+                          {ev.date
+                            ? new Date(ev.date).toLocaleDateString("en-GB")
+                            : "-"}
+                        </td>
                         <td className="p-2">{ev.location}</td>
                         <td className="p-2 flex flex-wrap gap-1">
                           {Array.isArray(ev.distance)
                             ? ev.distance.map((dist) => (
-                                <span
-                                  key={dist}
-                                  className={`${getBadgeColor(
-                                    dist
-                                  )} text-white text-xs px-2 py-1 rounded-full`}
-                                >
-                                  {getDistanceLabel(dist)}
-                                </span>
-                              ))
+                              <span
+                                key={dist}
+                                className={`${getBadgeColor(
+                                  dist
+                                )} text-white text-xs px-2 py-1 rounded-full`}
+                              >
+                                {getDistanceLabel(dist)}
+                              </span>
+                            ))
                             : ev.distance}
                         </td>
                         <td className="p-2">{ev.organizer}</td>
-                        <td className="p-2">{ev.registrationDeadline}</td>
-                        <td className="p-2 flex justify-center gap-4">
-                          <button
-                            onClick={() => handleEdit(ev)}
-                            title="Edit"
-                            className="hover:text-blue-400 text-lg"
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            onClick={() => requestDelete(ev._id)}
-                            title="Delete"
-                            className="hover:text-red-500 text-lg"
-                          >
-                            🗑️
-                          </button>
+                        
+                        <td
+                          className={`p-2 ${ev.registrationDeadline && new Date(ev.registrationDeadline) < new Date()
+                            ? "text-red-500 font-semibold"
+                            : ""
+                            }`}
+                        >
+                          {ev.registrationDeadline
+                            ? new Date(ev.registrationDeadline) < new Date()
+                              ? "Closed"
+                              : new Date(ev.registrationDeadline).toLocaleDateString("en-GB")
+                            : "-"}
                         </td>
+                        <td
+                          className="p-2 text-center align-middle"
+                          style={{ verticalAlign: "middle" }}
+                        >
+                          <div className="flex justify-center items-center gap-4">
+                            <button
+                              onClick={() => handleEdit(ev)}
+                              title="Edit"
+                              className="text-gray-300 hover:text-yellow-400 transition-colors duration-200 cursor-pointer hover:scale-110"
+                            >
+                              <Edit2 size={18} />
+                            </button>
+                            <button
+                              onClick={() => requestDelete(ev._id)}
+                              title="Delete"
+                              className="text-gray-300 hover:text-red-500 transition-colors duration-200 cursor-pointer hover:scale-110"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        </td>
+
                       </tr>
                     ))}
                   </tbody>
@@ -425,11 +449,10 @@ export default function RunningEventsUpdate() {
                 <button
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((prev) => prev - 1)}
-                  className={`px-3 py-1 rounded ${
-                    currentPage === 1
-                      ? "bg-gray-600 cursor-not-allowed"
-                      : "bg-yellow-400 text-black"
-                  }`}
+                  className={`px-3 py-1 rounded ${currentPage === 1
+                    ? "bg-gray-600 cursor-not-allowed"
+                    : "bg-yellow-400 text-black"
+                    }`}
                 >
                   Prev
                 </button>
@@ -438,11 +461,10 @@ export default function RunningEventsUpdate() {
                   <button
                     key={i + 1}
                     onClick={() => setCurrentPage(i + 1)}
-                    className={`px-3 py-1 rounded ${
-                      currentPage === i + 1
-                        ? "bg-yellow-400 text-black"
-                        : "bg-gray-700"
-                    }`}
+                    className={`px-3 py-1 rounded ${currentPage === i + 1
+                      ? "bg-yellow-400 text-black"
+                      : "bg-gray-700"
+                      }`}
                   >
                     {i + 1}
                   </button>
@@ -451,11 +473,10 @@ export default function RunningEventsUpdate() {
                 <button
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((prev) => prev + 1)}
-                  className={`px-3 py-1 rounded ${
-                    currentPage === totalPages
-                      ? "bg-gray-600 cursor-not-allowed"
-                      : "bg-yellow-400 text-black"
-                  }`}
+                  className={`px-3 py-1 rounded ${currentPage === totalPages
+                    ? "bg-gray-600 cursor-not-allowed"
+                    : "bg-yellow-400 text-black"
+                    }`}
                 >
                   Next
                 </button>
