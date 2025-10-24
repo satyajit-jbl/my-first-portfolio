@@ -1,6 +1,45 @@
 import { useEffect, useState } from "react";
 import { BASE_URL } from "../../../utils/config";
 import { Edit2, Trash2 } from "lucide-react";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
+
+// 🌌 Global SweetAlert2 Theme (Dark Blue + Glow)
+const swalTheme = Swal.mixin({
+  background: "linear-gradient(145deg, #0a0f24, #0d1533)", // dark-blue gradient
+  color: "#e0e7ff",
+  showClass: {
+    popup: "animate__animated animate__fadeInDown animate__faster",
+  },
+  hideClass: {
+    popup: "animate__animated animate__fadeOutUp animate__faster",
+  },
+  customClass: {
+    popup: "rounded-2xl shadow-2xl border border-blue-800/30 backdrop-blur-md",
+    title: "text-blue-300 font-semibold tracking-wide",
+    htmlContainer: "text-blue-100",
+    confirmButton:
+      "bg-gradient-to-r from-blue-500 to-cyan-400 text-black font-semibold px-5 py-2 rounded-lg shadow-lg hover:shadow-cyan-400/40 transition-all duration-300 focus:outline-none",
+    cancelButton:
+      "bg-gray-700 text-gray-200 px-5 py-2 rounded-lg hover:bg-gray-600 transition-all duration-300 focus:outline-none",
+  },
+  buttonsStyling: false,
+  timerProgressBar: true,
+});
+
+// 🌠 Global SweetAlert2 Toast Theme
+const Toast = swalTheme.mixin({
+  toast: true,
+  position: "top-end",
+  showConfirmButton: false,
+  timer: 3000,
+  showClass: { popup: "animate__animated animate__fadeInRight" },
+  hideClass: { popup: "animate__animated animate__fadeOutRight" },
+  customClass: {
+    popup:
+      "bg-[#0b1220]/95 text-blue-100 border border-blue-700/40 rounded-xl shadow-lg backdrop-blur-sm",
+  },
+});
 
 export default function RunningEventsUpdate() {
   const [events, setEvents] = useState([]);
@@ -22,22 +61,25 @@ export default function RunningEventsUpdate() {
     distance: "",
   });
 
-  // ✅ Pagination state
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 5;
 
-  // ✅ Fetch approved events
+  // Fetch events
   const fetchEvents = async () => {
     try {
       setLoading(true);
       const res = await fetch(`${BASE_URL}/events`);
       const data = await res.json();
-
-      // Sort by date ascending
       data.sort((a, b) => new Date(a.date) - new Date(b.date));
       setEvents(data);
     } catch (err) {
       console.error("Error fetching events:", err);
+      swalTheme.fire({
+        title: "Error!",
+        text: "Failed to fetch events.",
+        icon: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -47,7 +89,6 @@ export default function RunningEventsUpdate() {
     fetchEvents();
   }, []);
 
-  // ✅ Reset page to 1 when filter changes
   useEffect(() => {
     setCurrentPage(1);
   }, [filter]);
@@ -55,7 +96,6 @@ export default function RunningEventsUpdate() {
   const handleChange = (e) =>
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  // ✅ Handle multiple checkbox selection for distance
   const handleDistanceChange = (e) => {
     const value = e.target.value;
     setFormData((prev) => {
@@ -67,42 +107,66 @@ export default function RunningEventsUpdate() {
     });
   };
 
-  // ✅ Add or Update Event
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const method = editId ? "PUT" : "POST";
-      const url = editId
-        ? `${BASE_URL}/events/${editId}`
-        : `${BASE_URL}/events`;
+  
+  // Add or Update Event
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+  try {
+    // 🟢 Only confirm when adding a new event
+    if (!editId) {
+      const result = await swalTheme.fire({
+        title: "Add New Event?",
+        text: "This event will be sent for admin approval.",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, add it!",
+        cancelButtonText: "Cancel",
       });
 
-      const data = await res.json();
-      alert(data.message);
-
-      setFormData({
-        name: "",
-        date: "",
-        location: "",
-        distance: [],
-        organizer: "",
-        registrationDeadline: "",
-        registrationLink: "",
-      });
-      setEditId(null);
-      fetchEvents();
-    } catch (err) {
-      console.error("Error saving event:", err);
-      alert("Failed to submit. Check console.");
+      if (!result.isConfirmed) return; // Stop if user cancels
     }
-  };
 
-  // ✅ Prepare edit form
+    const method = editId ? "PUT" : "POST";
+    const url = editId ? `${BASE_URL}/events/${editId}` : `${BASE_URL}/events`;
+
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await res.json();
+
+    Toast.fire({
+      icon: "success",
+      title: data.message || (editId ? "Event updated!" : "Event added!"),
+    });
+
+    // Reset form
+    setFormData({
+      name: "",
+      date: "",
+      location: "",
+      distance: [],
+      organizer: "",
+      registrationDeadline: "",
+      registrationLink: "",
+    });
+    setEditId(null);
+    fetchEvents();
+  } catch (err) {
+    console.error("Error saving event:", err);
+    swalTheme.fire({
+      title: "Error!",
+      text: "Failed to submit. Check console.",
+      icon: "error",
+    });
+  }
+};
+
+
+  // Prepare edit form
   const handleEdit = (ev) => {
     const source =
       ev.pendingAction === "update" && ev.pendingData ? ev.pendingData : ev;
@@ -118,28 +182,51 @@ export default function RunningEventsUpdate() {
       registrationLink: source.registrationLink || "",
     });
     setEditId(ev._id);
-    alert(
-      "⚡ Your changes will be submitted as pending and will require admin approval."
-    );
+
+    swalTheme.fire({
+      title: `Edit Event: ${source.name}`,
+      text: "⚡ Update details and submit for review.",
+      icon: "info",
+      confirmButtonText: "Got it",
+    });
   };
 
-  // ✅ Request deletion
+  // Request deletion
   const requestDelete = async (id) => {
-    if (!confirm("Request deletion? This will await admin approval.")) return;
+    const result = await swalTheme.fire({
+      title: "Are you sure to delete this event?",
+      text: "This action will await admin approval.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, request it!",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       const res = await fetch(`${BASE_URL}/events/${id}/request`, {
         method: "DELETE",
       });
       const data = await res.json();
-      alert(data.message);
+
+      Toast.fire({
+        icon: "success",
+        title: data.message || "Deletion request sent!",
+      });
+
       fetchEvents();
     } catch (err) {
       console.error(err);
-      alert("Failed to request deletion");
+      swalTheme.fire({
+        title: "Error!",
+        text: "Failed to request deletion",
+        icon: "error",
+      });
     }
   };
 
-  // ✅ Distance badge helpers
+  // Distance badge helpers
   const getDistanceLabel = (dist) => {
     if (dist === "half") return "21k";
     if (dist === "full") return "42k";
@@ -163,7 +250,7 @@ export default function RunningEventsUpdate() {
     }
   };
 
-  // ✅ Apply filters
+  // Filtered + Paginated Events
   const filteredEvents = events.filter((ev) => {
     const matchesName = ev.name
       ?.toLowerCase()
@@ -182,7 +269,6 @@ export default function RunningEventsUpdate() {
     return matchesName && matchesLocation && matchesType && matchesDistance;
   });
 
-  // ✅ Pagination logic
   const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
   const startIndex = (currentPage - 1) * eventsPerPage;
   const currentEvents = filteredEvents.slice(
@@ -190,7 +276,7 @@ export default function RunningEventsUpdate() {
     startIndex + eventsPerPage
   );
 
-  return (
+ return (
     <div className="min-h-screen p-4 text-gray-100">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-yellow-400 text-center">
@@ -207,7 +293,7 @@ export default function RunningEventsUpdate() {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Event Name"
+              placeholder="Event Name & Date"
               required
               className="p-2 rounded bg-[#0f1724]"
             />
@@ -228,7 +314,7 @@ export default function RunningEventsUpdate() {
               className="p-2 rounded bg-[#0f1724]"
             />
 
-            {/* ✅ Multi distance checkboxes */}
+            {/* Distance checkboxes */}
             <div className="flex flex-wrap gap-3 bg-[#0f1724] p-2 rounded">
               {["5k", "7k", "10k", "half", "full"].map((dist) => (
                 <label key={dist} className="flex items-center gap-1">
@@ -248,12 +334,13 @@ export default function RunningEventsUpdate() {
               name="organizer"
               value={formData.organizer}
               onChange={handleChange}
-              placeholder="Organizer"
+              placeholder="Organizer & Registration Deadline"
               className="p-2 rounded bg-[#0f1724]"
             />
             <input
               type="date"
               name="registrationDeadline"
+              placeholder="registrationDeadline"
               value={formData.registrationDeadline}
               onChange={handleChange}
               required
@@ -300,7 +387,7 @@ export default function RunningEventsUpdate() {
           </div>
         </form>
 
-        {/* ✅ FILTER BAR */}
+        {/* FILTER BAR */}
         <div className="bg-[#0b1220] p-4 mb-6 rounded-lg flex flex-wrap gap-3 justify-center">
           <input
             type="text"
@@ -344,7 +431,9 @@ export default function RunningEventsUpdate() {
 
         {/* EVENTS TABLE */}
         <div className="bg-[#071128] p-4 rounded-lg shadow">
-          <h2 className="text-xl mb-3">Upcoming events(Click event name for registration)</h2>
+          <h2 className="text-xl mb-3">
+            Upcoming events (Click event name for registration)
+          </h2>
           {loading ? (
             <p>Loading...</p>
           ) : filteredEvents.length === 0 ? (
@@ -368,9 +457,7 @@ export default function RunningEventsUpdate() {
                   <tbody>
                     {currentEvents.map((ev, index) => (
                       <tr key={ev._id} className="border-t border-gray-700">
-                        <td className="p-2">
-                          {startIndex + index + 1}
-                        </td>
+                        <td className="p-2">{startIndex + index + 1}</td>
                         <td className="p-2">
                           <a
                             href={ev.registrationLink}
@@ -381,7 +468,6 @@ export default function RunningEventsUpdate() {
                             {ev.name}
                           </a>
                         </td>
-                        {/* <td className="p-2">{ev.date}</td> */}
                         <td className="p-2">
                           {ev.date
                             ? new Date(ev.date).toLocaleDateString("en-GB")
@@ -391,35 +477,35 @@ export default function RunningEventsUpdate() {
                         <td className="p-2 flex flex-wrap gap-1">
                           {Array.isArray(ev.distance)
                             ? ev.distance.map((dist) => (
-                              <span
-                                key={dist}
-                                className={`${getBadgeColor(
-                                  dist
-                                )} text-white text-xs px-2 py-1 rounded-full`}
-                              >
-                                {getDistanceLabel(dist)}
-                              </span>
-                            ))
+                                <span
+                                  key={dist}
+                                  className={`${getBadgeColor(
+                                    dist
+                                  )} text-white text-xs px-2 py-1 rounded-full`}
+                                >
+                                  {getDistanceLabel(dist)}
+                                </span>
+                              ))
                             : ev.distance}
                         </td>
                         <td className="p-2">{ev.organizer}</td>
-                        
                         <td
-                          className={`p-2 ${ev.registrationDeadline && new Date(ev.registrationDeadline) < new Date()
-                            ? "text-red-500 font-semibold"
-                            : ""
-                            }`}
+                          className={`p-2 ${
+                            ev.registrationDeadline &&
+                            new Date(ev.registrationDeadline) < new Date()
+                              ? "text-red-500 font-semibold"
+                              : ""
+                          }`}
                         >
                           {ev.registrationDeadline
                             ? new Date(ev.registrationDeadline) < new Date()
                               ? "Closed"
-                              : new Date(ev.registrationDeadline).toLocaleDateString("en-GB")
+                              : new Date(ev.registrationDeadline).toLocaleDateString(
+                                  "en-GB"
+                                )
                             : "-"}
                         </td>
-                        <td
-                          className="p-2 text-center align-middle"
-                          style={{ verticalAlign: "middle" }}
-                        >
+                        <td className="p-2 text-center align-middle">
                           <div className="flex justify-center items-center gap-4">
                             <button
                               onClick={() => handleEdit(ev)}
@@ -437,22 +523,22 @@ export default function RunningEventsUpdate() {
                             </button>
                           </div>
                         </td>
-
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
 
-              {/* ✅ PAGINATION CONTROLS */}
+              {/* PAGINATION */}
               <div className="flex justify-center items-center gap-2 mt-4">
                 <button
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((prev) => prev - 1)}
-                  className={`px-3 py-1 rounded ${currentPage === 1
-                    ? "bg-gray-600 cursor-not-allowed"
-                    : "bg-yellow-400 text-black"
-                    }`}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === 1
+                      ? "bg-gray-600 cursor-not-allowed"
+                      : "bg-yellow-400 text-black"
+                  }`}
                 >
                   Prev
                 </button>
@@ -461,10 +547,11 @@ export default function RunningEventsUpdate() {
                   <button
                     key={i + 1}
                     onClick={() => setCurrentPage(i + 1)}
-                    className={`px-3 py-1 rounded ${currentPage === i + 1
-                      ? "bg-yellow-400 text-black"
-                      : "bg-gray-700"
-                      }`}
+                    className={`px-3 py-1 rounded ${
+                      currentPage === i + 1
+                        ? "bg-yellow-400 text-black"
+                        : "bg-gray-700"
+                    }`}
                   >
                     {i + 1}
                   </button>
@@ -473,10 +560,11 @@ export default function RunningEventsUpdate() {
                 <button
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((prev) => prev + 1)}
-                  className={`px-3 py-1 rounded ${currentPage === totalPages
-                    ? "bg-gray-600 cursor-not-allowed"
-                    : "bg-yellow-400 text-black"
-                    }`}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === totalPages
+                      ? "bg-gray-600 cursor-not-allowed"
+                      : "bg-yellow-400 text-black"
+                  }`}
                 >
                   Next
                 </button>
@@ -488,3 +576,4 @@ export default function RunningEventsUpdate() {
     </div>
   );
 }
+

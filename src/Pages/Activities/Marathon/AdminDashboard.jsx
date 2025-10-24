@@ -1,3 +1,4 @@
+
 // import { useEffect, useState } from "react";
 // import { BASE_URL } from "../../../utils/config";
 
@@ -5,7 +6,6 @@
 //   const [pending, setPending] = useState([]);
 //   const [loading, setLoading] = useState(false);
 
-//   // 🔹 Normalize distance (array or string)
 //   const formatDistance = (val) => {
 //     if (Array.isArray(val)) return val.join(", ");
 //     if (typeof val === "string") return val;
@@ -39,8 +39,8 @@
 //       const data = await res.json();
 //       setPending(data);
 //     } catch (err) {
-//       console.error("Error loading pending:", err);
-//       alert("Failed to load pending items (check console)");
+//       console.error(err);
+//       alert("Failed to load pending items");
 //     } finally {
 //       setLoading(false);
 //     }
@@ -51,9 +51,7 @@
 //   }, []);
 
 //   const approve = async (id) => {
-//     const pwd =
-//       sessionStorage.getItem("admin_pwd") ||
-//       prompt("Enter admin password to approve:");
+//     const pwd = sessionStorage.getItem("admin_pwd") || prompt("Enter admin password to approve:");
 //     if (!pwd) return;
 //     try {
 //       const res = await fetch(`${BASE_URL}/events/${id}/approve`, {
@@ -75,9 +73,7 @@
 //   };
 
 //   const reject = async (id) => {
-//     const pwd =
-//       sessionStorage.getItem("admin_pwd") ||
-//       prompt("Enter admin password to reject:");
+//     const pwd = sessionStorage.getItem("admin_pwd") || prompt("Enter admin password to reject:");
 //     if (!pwd) return;
 //     try {
 //       const res = await fetch(`${BASE_URL}/events/${id}/reject`, {
@@ -109,6 +105,12 @@
 //     );
 //   };
 
+//   const getRequestDate = (item) => {
+//     return item.requestedAt
+//       ? new Date(item.requestedAt).toLocaleString()
+//       : "-";
+//   };
+
 //   return (
 //     <div className="min-h-screen p-4 text-gray-100">
 //       <div className="max-w-5xl mx-auto">
@@ -131,22 +133,18 @@
 //                 key={item._id}
 //                 className=" p-4 rounded mb-4 border border-gray-700"
 //               >
-//                 {/* 🔹 Action Summary Title */}
 //                 <h2 className="text-xl font-semibold mb-2">
 //                   {action === "create" && "🟢 New Event Pending Approval"}
 //                   {action === "update" && "🟡 Event Update Pending Approval"}
 //                   {action === "delete" && "🔴 Deletion Request Pending Approval"}
 //                 </h2>
 
-//                 {/* 🔹 Basic Info */}
 //                 <p className="text-sm text-gray-400 mb-2">
-//                   ID: {item._id} | Requested on:{" "}
-//                   {new Date(item.dateCreated).toLocaleString()}
+//                   ID: {item._id} | Requested on: {getRequestDate(item)}
 //                 </p>
 
-//                 {/* 🔹 CREATE Action */}
 //                 {action === "create" && (
-//                   <div className=" p-3 rounded">
+//                   <div className="p-3 rounded">
 //                     <p className="text-yellow-300 font-semibold mb-2">
 //                       New Event Details:
 //                     </p>
@@ -158,7 +156,6 @@
 //                   </div>
 //                 )}
 
-//                 {/* 🔹 UPDATE Action */}
 //                 {action === "update" && (
 //                   <div className="bg-[#08152d] p-3 rounded">
 //                     <p className="text-yellow-300 font-semibold mb-2">
@@ -168,21 +165,13 @@
 //                       <tbody>
 //                         {renderChangeRow("Name", oldData.name, newData.name)}
 //                         {renderChangeRow("Date", oldData.date, newData.date)}
-//                         {renderChangeRow(
-//                           "Location",
-//                           oldData.location,
-//                           newData.location
-//                         )}
+//                         {renderChangeRow("Location", oldData.location, newData.location)}
 //                         {renderChangeRow(
 //                           "Distance",
 //                           formatDistance(oldData.distance),
 //                           formatDistance(newData.distance)
 //                         )}
-//                         {renderChangeRow(
-//                           "Organizer",
-//                           oldData.organizer,
-//                           newData.organizer
-//                         )}
+//                         {renderChangeRow("Organizer", oldData.organizer, newData.organizer)}
 //                         {renderChangeRow(
 //                           "Deadline",
 //                           oldData.registrationDeadline,
@@ -193,7 +182,6 @@
 //                   </div>
 //                 )}
 
-//                 {/* 🔹 DELETE Action */}
 //                 {action === "delete" && (
 //                   <div className="bg-[#240b0b] p-3 rounded">
 //                     <p className="text-red-300 font-semibold mb-2">
@@ -207,7 +195,6 @@
 //                   </div>
 //                 )}
 
-//                 {/* 🔹 Action Buttons */}
 //                 <div className="flex gap-3 mt-3">
 //                   <button
 //                     onClick={() => approve(item._id)}
@@ -233,10 +220,73 @@
 
 import { useEffect, useState } from "react";
 import { BASE_URL } from "../../../utils/config";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
+import "animate.css";
 
 export default function AdminDashboard() {
   const [pending, setPending] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // 🌙 SweetAlert2 with theme
+  const swalWithTheme = Swal.mixin({
+    background: "#0b132b",
+    color: "#f8f9fa",
+    confirmButtonColor: "#facc15", // yellow accent
+    cancelButtonColor: "#6b7280", // neutral gray
+    showClass: {
+      popup: "animate__animated animate__fadeInDown",
+    },
+    hideClass: {
+      popup: "animate__animated animate__fadeOutUp",
+    },
+  });
+
+  // 🔔 Toast notification setup
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    background: "#0b132b",
+    color: "#f8f9fa",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    showClass: {
+      popup: "animate__animated animate__fadeInRight",
+    },
+    hideClass: {
+      popup: "animate__animated animate__fadeOutRight",
+    },
+  });
+
+  // 🧩 Utility alerts
+  const showAlert = (title, text, icon = "info", timer = 3000) => {
+    swalWithTheme.fire({
+      title,
+      text,
+      icon,
+      timer,
+      showConfirmButton: false,
+      timerProgressBar: true,
+      position: "center",
+    });
+  };
+
+  // 🔹 Confirm before approving or rejecting
+  const confirmAction = async (type) => {
+    const res = await swalWithTheme.fire({
+      title: type === "approve" ? "✅ Approve Event?" : "❌ Reject Event?",
+      text:
+        type === "approve"
+          ? "Are you sure you want to approve this event?"
+          : "Are you sure you want to reject this event?",
+      icon: type === "approve" ? "success" : "error",
+      showCancelButton: true,
+      confirmButtonText: type === "approve" ? "Yes, Approve" : "Yes, Reject",
+      cancelButtonText: "Cancel",
+    });
+    return res.isConfirmed;
+  };
 
   const formatDistance = (val) => {
     if (Array.isArray(val)) return val.join(", ");
@@ -249,7 +299,15 @@ export default function AdminDashboard() {
     try {
       let adminPwd = sessionStorage.getItem("admin_pwd") || null;
       if (!adminPwd) {
-        adminPwd = prompt("Enter admin password to view pending actions:");
+        adminPwd = await swalWithTheme
+          .fire({
+            title: "Enter Admin Password",
+            input: "password",
+            inputPlaceholder: "Enter your admin secret",
+            confirmButtonText: "Submit",
+          })
+          .then((res) => res.value);
+
         if (!adminPwd) {
           setLoading(false);
           return;
@@ -263,7 +321,7 @@ export default function AdminDashboard() {
 
       if (res.status === 403) {
         sessionStorage.removeItem("admin_pwd");
-        alert("Incorrect admin password");
+        showAlert("Access Denied", "Incorrect admin password", "error");
         setLoading(false);
         return;
       }
@@ -272,7 +330,7 @@ export default function AdminDashboard() {
       setPending(data);
     } catch (err) {
       console.error(err);
-      alert("Failed to load pending items");
+      showAlert("Error", "Failed to load pending items", "error");
     } finally {
       setLoading(false);
     }
@@ -283,46 +341,96 @@ export default function AdminDashboard() {
   }, []);
 
   const approve = async (id) => {
-    const pwd = sessionStorage.getItem("admin_pwd") || prompt("Enter admin password to approve:");
+    const confirmed = await confirmAction("approve");
+    if (!confirmed) return;
+
+    const pwd =
+      sessionStorage.getItem("admin_pwd") ||
+      (await swalWithTheme
+        .fire({
+          title: "Enter Admin Password",
+          input: "password",
+          inputPlaceholder: "Enter your admin secret",
+          confirmButtonText: "Submit",
+        })
+        .then((res) => res.value));
+
     if (!pwd) return;
+
     try {
       const res = await fetch(`${BASE_URL}/events/${id}/approve`, {
         method: "PUT",
         headers: { "x-admin-secret": pwd },
       });
+
       if (res.status === 403) {
         sessionStorage.removeItem("admin_pwd");
-        alert("Incorrect password");
+        Toast.fire({
+          icon: "error",
+          title: "Incorrect password ❌",
+        });
         return;
       }
+
       const data = await res.json();
-      alert(data.message);
+      Toast.fire({
+        icon: "success",
+        title: data.message || "Event approved successfully ✅",
+      });
       fetchPending();
     } catch (err) {
       console.error(err);
-      alert("Failed to approve");
+      Toast.fire({
+        icon: "error",
+        title: "Failed to approve event ❗",
+      });
     }
   };
 
   const reject = async (id) => {
-    const pwd = sessionStorage.getItem("admin_pwd") || prompt("Enter admin password to reject:");
+    const confirmed = await confirmAction("reject");
+    if (!confirmed) return;
+
+    const pwd =
+      sessionStorage.getItem("admin_pwd") ||
+      (await swalWithTheme
+        .fire({
+          title: "Enter Admin Password",
+          input: "password",
+          inputPlaceholder: "Enter your admin secret",
+          confirmButtonText: "Submit",
+        })
+        .then((res) => res.value));
+
     if (!pwd) return;
+
     try {
       const res = await fetch(`${BASE_URL}/events/${id}/reject`, {
         method: "DELETE",
         headers: { "x-admin-secret": pwd },
       });
+
       if (res.status === 403) {
         sessionStorage.removeItem("admin_pwd");
-        alert("Incorrect password");
+        Toast.fire({
+          icon: "error",
+          title: "Incorrect password ❌",
+        });
         return;
       }
+
       const data = await res.json();
-      alert(data.message);
+      Toast.fire({
+        icon: "warning",
+        title: data.message || "Event rejected ⚠️",
+      });
       fetchPending();
     } catch (err) {
       console.error(err);
-      alert("Failed to reject");
+      Toast.fire({
+        icon: "error",
+        title: "Failed to reject event ❗",
+      });
     }
   };
 
@@ -363,7 +471,7 @@ export default function AdminDashboard() {
             return (
               <div
                 key={item._id}
-                className=" p-4 rounded mb-4 border border-gray-700"
+                className="p-4 rounded mb-4 border border-gray-700"
               >
                 <h2 className="text-xl font-semibold mb-2">
                   {action === "create" && "🟢 New Event Pending Approval"}
