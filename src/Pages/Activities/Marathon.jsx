@@ -47,7 +47,7 @@ export default function Marathon() {
       <aside className="lg:w-1/4 w-full p-6 border-b lg:border-b-0 lg:border-r border-gray-200 flex flex-col gap-6">
         <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold mb-2 text-yellow-400">Miles & Memories</h2>
         <p className="text-sm md:text-base text-gray-300 leading-relaxed">
-          "Running isn’t just a hobby, it’s my lifestyle. I lace up my shoes, hit the roads or trails, and conquer the day! From tracking my miles and pace on Strava to celebrating every personal record, each run is a journey of discipline, joy, and growth."
+          Running isn’t just a hobby, it’s my lifestyle. I lace up my shoes, hit the roads or trails, and conquer the day! From tracking my miles and pace on Strava to celebrating every personal record, each run is a journey of discipline, joy, and growth.
         </p>
 
         <ul className="space-y-2 text-sm md:text-base">
