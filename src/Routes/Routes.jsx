@@ -32,6 +32,7 @@ import StravaDashboard from "../components/StravaDashboard";
 import MarathonAwards from "../Pages/Activities/Marathon/MarathonAwards";
 import RunningEventsUpdate from "../Pages/Activities/Marathon/RunningEventsUpdate";
 import AdminDashboard from "../Pages/Activities/Marathon/AdminDashboard";
+import MyRunningGears from "../Pages/Activities/Marathon/MyRunningGears";
 
 export const router = createBrowserRouter([
   {
@@ -80,6 +81,7 @@ export const router = createBrowserRouter([
           { path: "events", element: <RunningEvents /> },
           { path: "RunAwards", element: <MarathonAwards /> },
           { path: "strava", element: <StravaDashboard /> },
+          { path: "runningGear", element: <MyRunningGears /> },
           { path: "update", element: <RunningEventsUpdate /> },
           { path: "admin", element: <AdminDashboard /> },
           // { path: "strava", element: <StravaActivities /> },
