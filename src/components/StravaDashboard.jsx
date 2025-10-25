@@ -1,5 +1,3 @@
-
-// // /* eslint-disable no-unused-vars */
 // import { useEffect, useState, useMemo } from "react";
 // import {
 //   ResponsiveContainer,
@@ -13,13 +11,7 @@
 //   Line,
 // } from "recharts";
 
-
-// const STRAVA_ACTIVITIES_URL = "https://www.strava.com/api/v3/athlete/activities";
-// const CLIENT_ID = import.meta.env.VITE_STRAVA_CLIENT_ID;
-// const CLIENT_SECRET = import.meta.env.VITE_STRAVA_CLIENT_SECRET;
-
-// // Replace this with your Strava profile link
-// const STRAVA_PROFILE_LINK = "https://www.strava.com/athletes/132335060";
+// const STRAVA_ACTIVITIES_URL = `${import.meta.env.VITE_API_BASE}/strava/activities`;
 
 // export default function StravaDashboard() {
 //   const [activities, setActivities] = useState([]);
@@ -31,63 +23,17 @@
 //   const [currentPage, setCurrentPage] = useState(1);
 //   const itemsPerPage = 9;
 
-//   // Load tokens
-//   let ACCESS_TOKEN =
-//     localStorage.getItem("STRAVA_ACCESS_TOKEN") || import.meta.env.VITE_STRAVA_ACCESS_TOKEN;
-//   let REFRESH_TOKEN =
-//     localStorage.getItem("STRAVA_REFRESH_TOKEN") || import.meta.env.VITE_STRAVA_REFRESH_TOKEN;
-
-//   // Refresh token
-//   async function refreshStravaToken() {
-//     try {
-//       const response = await fetch("https://www.strava.com/oauth/token", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-//         body: new URLSearchParams({
-//           client_id: CLIENT_ID,
-//           client_secret: CLIENT_SECRET,
-//           grant_type: "refresh_token",
-//           refresh_token: REFRESH_TOKEN,
-//         }),
-//       });
-//       const data = await response.json();
-//       if (data.access_token) {
-//         ACCESS_TOKEN = data.access_token;
-//         REFRESH_TOKEN = data.refresh_token;
-//         localStorage.setItem("STRAVA_ACCESS_TOKEN", ACCESS_TOKEN);
-//         localStorage.setItem("STRAVA_REFRESH_TOKEN", REFRESH_TOKEN);
-//       } else {
-//         console.error("Failed to refresh token", data);
-//       }
-//     } catch (err) {
-//       console.error("Error refreshing token", err);
-//     }
-//   }
-
-//   // Fetch activities
+//   // Fetch activities from backend
 //   async function fetchActivities() {
 //     setLoading(true);
 //     try {
-//       let token = ACCESS_TOKEN;
-//       let response = await fetch(`${STRAVA_ACTIVITIES_URL}?per_page=50`, {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-
-//       if (response.status === 401) {
-//         await refreshStravaToken();
-//         token = localStorage.getItem("STRAVA_ACCESS_TOKEN");
-//         response = await fetch(`${STRAVA_ACTIVITIES_URL}?per_page=50`, {
-//           headers: { Authorization: `Bearer ${token}` },
-//         });
-//       }
-
-//       if (!response.ok) throw new Error(`Strava API error (${response.status})`);
-
+//       const response = await fetch(STRAVA_ACTIVITIES_URL);
+//       if (!response.ok) throw new Error(`Backend error (${response.status})`);
 //       const data = await response.json();
 //       setActivities(data);
 //     } catch (err) {
 //       console.error("Error fetching activities:", err);
-//       setError("Failed to load activities. Check your token.");
+//       setError("Failed to load Strava activities.");
 //       setActivities([]);
 //     } finally {
 //       setLoading(false);
@@ -96,11 +42,9 @@
 
 //   useEffect(() => {
 //     fetchActivities();
-//     const interval = setInterval(refreshStravaToken, 60 * 60 * 1000); // auto-refresh every hour
-//     return () => clearInterval(interval);
 //   }, []);
 
-//   // Filter activities
+//   // Filters
 //   const filteredActivities = useMemo(() => {
 //     return activities.filter((act) => {
 //       const distanceKm = act.distance / 1000;
@@ -110,7 +54,7 @@
 //     });
 //   }, [activities, filters]);
 
-//   // Sort activities
+//   // Sorting
 //   const sortedActivities = useMemo(() => {
 //     let sorted = [...filteredActivities];
 //     if (sortBy === "date") sorted.sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
@@ -121,6 +65,7 @@
 //   }, [filteredActivities, sortBy]);
 
 //   // Pagination
+//   // eslint-disable-next-line no-unused-vars
 //   const totalPages = Math.ceil(sortedActivities.length / itemsPerPage);
 //   const paginatedActivities = sortedActivities.slice(
 //     (currentPage - 1) * itemsPerPage,
@@ -150,18 +95,8 @@
 //       <header className="text-center mb-8">
 //         <h1 className="text-3xl md:text-5xl font-bold text-yellow-400 mb-2">🏃 Strava Dashboard</h1>
 //         <p className="text-gray-400 max-w-xl mx-auto">
-//           Welcome to my Strava Dashboard! Track all my running, cycling, and other activities directly
-//           from my Strava profile. Explore stats, filter by type or distance, analyze trends, and see
-//           my personal achievements. Check my full profile{" "}
-//           <a
-//             href={STRAVA_PROFILE_LINK}
-//             target="_blank"
-//             rel="noopener noreferrer"
-//             className="text-yellow-400 underline hover:text-yellow-300"
-//           >
-//             here
-//           </a>
-//           .
+//           Welcome to my Strava Dashboard! Track all my running, cycling, and other activities
+//           directly from my Strava profile.
 //         </p>
 //       </header>
 
@@ -187,14 +122,12 @@
 
 //       {/* Activity Chart */}
 //       {!loading && filteredActivities.length > 0 && (
-//         <div className=" rounded-3xl p-6 mb-8">
-//           <h2 className="text-xl font-semibold text-yellow-400 mb-4 text-center">
-//             📊 Activity Overview
-//           </h2>
+//         <div className="rounded-3xl p-6 mb-8">
+//           <h2 className="text-xl font-semibold text-yellow-400 mb-4 text-center">📊 Activity Overview</h2>
 //           <ResponsiveContainer width="100%" height={300}>
 //             <ComposedChart
 //               data={[...filteredActivities]
-//                 .slice() // clone
+//                 .slice()
 //                 .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
 //                 .map((act) => ({
 //                   date: new Date(act.start_date).toLocaleDateString(),
@@ -206,32 +139,17 @@
 //               <CartesianGrid strokeDasharray="3 3" stroke="#444" />
 //               <XAxis dataKey="date" tick={{ fill: "#ccc", fontSize: 10 }} />
 //               <YAxis yAxisId="left" tick={{ fill: "#ccc" }} />
-//               <YAxis
-//                 yAxisId="right"
-//                 orientation="right"
-//                 tick={{ fill: "#ccc" }}
-//                 domain={[0, "auto"]}
-//               />
-//               <Tooltip
-//                 contentStyle={{ background: "#222", border: "none", color: "#fff" }}
-//               />
+//               <YAxis yAxisId="right" orientation="right" tick={{ fill: "#ccc" }} domain={[0, "auto"]} />
+//               <Tooltip contentStyle={{ background: "#222", border: "none", color: "#fff" }} />
 //               <Legend />
 //               <Bar yAxisId="left" dataKey="distance" fill="#facc15" name="Distance (km)" />
-//               <Line
-//                 yAxisId="right"
-//                 type="monotone"
-//                 dataKey="speed"
-//                 stroke="#3b82f6"
-//                 name="Avg Speed (km/h)"
-//                 dot={false}
-//               />
+//               <Line yAxisId="right" type="monotone" dataKey="speed" stroke="#3b82f6" name="Avg Speed (km/h)" dot={false} />
 //             </ComposedChart>
 //           </ResponsiveContainer>
 //         </div>
 //       )}
 
-
-//       {/* Filters + Sorting */}
+//       {/* Filters */}
 //       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 flex-wrap">
 //         <div className="flex gap-2 items-center">
 //           <label htmlFor="type" className="text-gray-300 font-medium">Activity Type:</label>
@@ -239,10 +157,7 @@
 //             id="type"
 //             className="bg-gray-800 text-gray-200 px-3 py-1 rounded-lg"
 //             value={filters.type}
-//             onChange={(e) => {
-//               setFilters((f) => ({ ...f, type: e.target.value }));
-//               setCurrentPage(1);
-//             }}
+//             onChange={(e) => { setFilters(f => ({ ...f, type: e.target.value })); setCurrentPage(1); }}
 //           >
 //             <option>All</option>
 //             <option>Run</option>
@@ -260,10 +175,7 @@
 //             min={0}
 //             max={100}
 //             value={filters.minDistance}
-//             onChange={(e) => {
-//               setFilters((f) => ({ ...f, minDistance: Number(e.target.value) }));
-//               setCurrentPage(1);
-//             }}
+//             onChange={(e) => { setFilters(f => ({ ...f, minDistance: Number(e.target.value) })); setCurrentPage(1); }}
 //             className="w-16 bg-gray-800 text-gray-200 px-2 py-1 rounded-lg text-center"
 //           />
 //           <span className="text-gray-400">-</span>
@@ -272,10 +184,7 @@
 //             min={0}
 //             max={500}
 //             value={filters.maxDistance}
-//             onChange={(e) => {
-//               setFilters((f) => ({ ...f, maxDistance: Number(e.target.value) }));
-//               setCurrentPage(1);
-//             }}
+//             onChange={(e) => { setFilters(f => ({ ...f, maxDistance: Number(e.target.value) })); setCurrentPage(1); }}
 //             className="w-16 bg-gray-800 text-gray-200 px-2 py-1 rounded-lg text-center"
 //           />
 //         </div>
@@ -285,10 +194,7 @@
 //           <select
 //             className="bg-gray-800 text-gray-200 px-3 py-1 rounded-lg"
 //             value={sortBy}
-//             onChange={(e) => {
-//               setSortBy(e.target.value);
-//               setCurrentPage(1);
-//             }}
+//             onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
 //           >
 //             <option value="date">Date</option>
 //             <option value="distance">Distance</option>
@@ -300,9 +206,7 @@
 //       {/* Activity Cards */}
 //       {loading && <div className="text-center text-gray-400">Loading Strava activities...</div>}
 //       {error && <div className="text-center text-red-500">{error}</div>}
-//       {!loading && paginatedActivities.length === 0 && (
-//         <div className="text-center text-gray-400">No activities match your filters.</div>
-//       )}
+//       {!loading && paginatedActivities.length === 0 && <div className="text-center text-gray-400">No activities match your filters.</div>}
 
 //       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 //         {paginatedActivities.map((act) => {
@@ -312,14 +216,9 @@
 //           const elevation = act.total_elevation_gain ? act.total_elevation_gain.toFixed(2) : "0.00";
 
 //           return (
-//             <div
-//               key={act.id}
-//               className="bg-gray-800/60 p-5 rounded-3xl shadow-lg hover:scale-105 transform transition"
-//             >
+//             <div key={act.id} className="bg-gray-800/60 p-5 rounded-3xl shadow-lg hover:scale-105 transform transition">
 //               <h2 className="text-xl font-bold text-yellow-400 mb-2">{act.name}</h2>
-//               <p className="text-gray-400 text-sm mb-2">
-//                 {new Date(act.start_date).toLocaleDateString()} • {act.type}
-//               </p>
+//               <p className="text-gray-400 text-sm mb-2">{new Date(act.start_date).toLocaleDateString()} • {act.type}</p>
 //               <div className="flex flex-wrap gap-3 text-gray-300 text-sm">
 //                 <span>🏁 {distanceKm} km</span>
 //                 <span>⏱ {movingTimeMin} min</span>
@@ -330,37 +229,10 @@
 //           );
 //         })}
 //       </div>
-
-//       {/* Pagination Controls */}
-//       {totalPages > 1 && (
-//         <div className="flex justify-center mt-8 gap-3 flex-wrap">
-//           <button
-//             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-//             className="px-3 py-1 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
-//           >
-//             Prev
-//           </button>
-//           {[...Array(totalPages)].map((_, i) => (
-//             <button
-//               key={i}
-//               onClick={() => setCurrentPage(i + 1)}
-//               className={`px-3 py-1 rounded-lg transition ${currentPage === i + 1 ? "bg-yellow-400 text-black" : "bg-gray-700 hover:bg-gray-600"
-//                 }`}
-//             >
-//               {i + 1}
-//             </button>
-//           ))}
-//           <button
-//             onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-//             className="px-3 py-1 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
-//           >
-//             Next
-//           </button>
-//         </div>
-//       )}
 //     </div>
 //   );
 // }
+
 
 import { useEffect, useState, useMemo } from "react";
 import {
@@ -374,8 +246,9 @@ import {
   Bar,
   Line,
 } from "recharts";
+import { BASE_URL } from "../utils/config"; // adjust path if needed
 
-const STRAVA_ACTIVITIES_URL = `${import.meta.env.VITE_API_BASE}/strava/activities`;
+const STRAVA_ACTIVITIES_URL = `${BASE_URL}/strava/activities`;
 
 export default function StravaDashboard() {
   const [activities, setActivities] = useState([]);
@@ -506,7 +379,14 @@ export default function StravaDashboard() {
               <Tooltip contentStyle={{ background: "#222", border: "none", color: "#fff" }} />
               <Legend />
               <Bar yAxisId="left" dataKey="distance" fill="#facc15" name="Distance (km)" />
-              <Line yAxisId="right" type="monotone" dataKey="speed" stroke="#3b82f6" name="Avg Speed (km/h)" dot={false} />
+              <Line
+                yAxisId="right"
+                type="monotone"
+                dataKey="speed"
+                stroke="#3b82f6"
+                name="Avg Speed (km/h)"
+                dot={false}
+              />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
