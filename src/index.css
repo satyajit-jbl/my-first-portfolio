@@ -148,3 +148,24 @@
   color: black !important;
 }
 
+
+/* 🌙 Dark theme fix for SweetAlert2 select dropdown */
+.swal2-select {
+  background-color: #0f172a !important; /* dark bg (same as your modal) */
+  color: #f8fafc !important; /* white text */
+  border: 1px solid #334155 !important; /* slate border */
+  border-radius: 0.5rem !important; /* rounded */
+  padding: 0.5rem !important;
+  font-size: 0.95rem !important;
+  appearance: none !important; /* remove default arrow style */
+}
+
+.swal2-select:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px #facc15 !important; /* yellow focus ring */
+}
+
+.swal2-select option {
+  background-color: #1e293b !important; /* slate-800 for dropdown items */
+  color: #f8fafc !important;
+}
